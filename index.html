@@ -789,7 +789,7 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
   <span class="sn">12 / 60</span>
   <div class="wrap gap-l">
     <div><div class="eyebrow">1.3 Чөлөөт мөнгөн урсгал (Free Cash Flow, FCF)</div>
-    <p class="h2 rv" style="max-width:24ch">Үйл ажиллагааг хэвийн үргэлжлүүлэхэд шаардлагатай хөрөнгө оруулалтын дараа хөрөнгө оруулагчдад үлдэх мөнгөн урсгал.</p>
+    <p class="h2 rv" id="fcfstmt" style="max-width:24ch">Үйл ажиллагааг хэвийн үргэлжлүүлэхэд шаардлагатай хөрөнгө оруулалтын дараа хөрөнгө оруулагчдад үлдэх мөнгөн урсгал.</p>
     <div class="fx big rv">FCF = NOPAT − Үйл ажиллагааны капиталын цэвэр хөрөнгө оруулалт<span class="en">FCF = NOPAT − Net investment in total operating capital</span></div></div>
     <div class="grid3">
       <div class="card rv stack"><h3 class="h3">FCF юунд ашиглагдах вэ?</h3><ol class="steps">
@@ -820,7 +820,7 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
 <section class="slide">
   <span class="sn">14 / 60</span>
   <div class="wrap gap-l">
-    <div><div class="eyebrow">1.4 Үйл ажиллагааны үр ашгийг хэмжих</div></div>
+    <div><div class="eyebrow" id="roicsec">1.4 Үйл ажиллагааны үр ашгийг хэмжих</div></div>
     <div class="grid3">
       <div class="card metric rv"><span class="ab">ROIC</span><div><div class="nm">Оруулсан капиталын өгөөж</div><div class="en">(Return on invested capital)</div></div>
         <div class="formula"><span class="frac"><span>NOPAT</span><span>Нийт цэвэр үйл ажиллагааны капитал</span></span></div>
@@ -844,7 +844,7 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
   <span class="sn">15 / 60</span>
   <div class="wrap gap-l">
     <div><div class="eyebrow">1.5 Зах зээлийн ба эдийн засгийн нэмэгдэл үнэ цэнэ</div>
-    <h2 class="h2 rv" style="max-width:22ch">Компанийн үнэ цэнэ нь ирээдүйд бий болгох чөлөөт мөнгөн урсгалын өнөөгийн үнэ цэнээс хамаарна.</h2></div>
+    <h2 class="h2 rv" id="valstmt" style="max-width:22ch">Компанийн үнэ цэнэ нь ирээдүйд бий болгох чөлөөт мөнгөн урсгалын өнөөгийн үнэ цэнээс хамаарна.</h2></div>
     <div class="grid2">
       <div class="card rv stack"><div class="span">БАЙГУУЛАГДСАНААС ХОЙШХИ ҮР ДҮН</div><h3 class="h3">MVA</h3>
         <p class="muted">(Market Value Added) гэдэг нь компанийн зах зээлийн үнэ цэнэ оруулсан нийт хөрөнгөөс хэр ихээр давж байгааг хэмждэг</p>
@@ -1183,6 +1183,40 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
   </div>
 </section>
 
+<!-- SIMULATION (Pudding-style: run the 1998 paper's own model) -->
+<section class="slide sim" id="sim">
+  <span class="sn">31+ / 60</span>
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">Симуляци · Dechow, Kothari, Watts (1998) загвар</div>
+      <h2 class="h2 rv">Аккруэл мөнгөн урсгалын хэлбэлзлийг хэрхэн зөөлрүүлдэг вэ?</h2>
+      <p class="lede rv">Судалгааны онолын загварыг өмнөх слайдын дундаж параметрүүдээр 30 жил ажиллуулав. Борлуулалт санамсаргүй алхалтаар өөрчлөгдөж, авлага, бараа материал, өглөг нь борлуулалттай пропорциональ байна.</p>
+    </div>
+    <div class="simgrid">
+      <div class="chart rv">
+        <div class="legend"><span class="key"><i style="background:var(--earn)"></i>Цэвэр ашиг (Earnings)</span><span class="key"><i style="background:var(--cash)"></i>Үйл ажиллагааны мөнгөн урсгал (CFO)</span><span class="key"><i style="background:var(--accr)"></i>Аккруэл</span></div>
+        <svg class="svgchart" id="simchart" viewBox="0 0 720 330" role="img" aria-label="Симуляцийн цэвэр ашиг ба мөнгөн урсгалын 30 жилийн цуврал"></svg>
+        <p class="note">Энэ нь загварын симуляци бөгөөд бодит компанийн өгөгдөл биш. Нэгж: нөхцөлт.</p>
+      </div>
+      <div class="stack">
+        <div class="simstats">
+          <div class="tile earn"><b id="sdE">0</b><span>ΔEarnings-ийн стандарт хазайлт</span></div>
+          <div class="tile cash"><b id="sdC">0</b><span>ΔCFO-ийн стандарт хазайлт</span></div>
+          <div class="tile"><b id="ratioEC">0×</b><span>ΔCFO хэлбэлзэл ΔEarnings-ээс хэд дахин их вэ<br><em>Судалгаа: 4.94 / 0.85</em></span></div>
+          <div class="tile accr"><b id="acC">0</b><span>ΔCFO-ийн хугацааны корреляц<br><em>Судалгааны бодит үр дүн: -0.28</em></span></div>
+        </div>
+        <div class="card stack simctl">
+          <div class="sl"><label for="simP">Profit Margin (p) <output id="simPo"></output></label><input type="range" id="simP" min="1" max="15" step="0.05" value="4.95"></div>
+          <div class="sl"><label for="simA">Accounts Receivable (a) <output id="simAo"></output></label><input type="range" id="simA" min="0" max="40" step="1" value="15"></div>
+          <div class="sl"><label for="simC">Inventory (c1) <output id="simCo"></output></label><input type="range" id="simC" min="0" max="40" step="1" value="16"></div>
+          <div class="sl"><label for="simB">Accounts Payable (b) <output id="simBo"></output></label><input type="range" id="simB" min="0" max="30" step="1" value="7"></div>
+          <div class="simbtns"><button type="button" class="btn" id="simRoll">Шинэ санамсаргүй цуврал</button><button type="button" class="btn ghost" id="simReset">Судалгааны утга руу буцаах</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- S32 forecast -->
 <section class="slide">
   <span class="sn">32 / 60</span>
@@ -1510,6 +1544,41 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
     <div class="tl rv" id="tl" aria-label="Судалгаа 1: 1963–1992, Судалгаа 2: 2018–2021"></div>
   </div>
 </section>
+<!-- SCOREBOARD 1998 vs 2023 -->
+<section class="slide score" id="score">
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">Хоёр судалгаа · нэг асуулт</div>
+      <h2 class="h2 rv">Ирээдүйн мөнгөн урсгалыг аль нь илүү сайн таамаглах вэ?</h2>
+    </div>
+    <div class="scoregrid">
+      <article class="card scorecard rv" data-win="earn">
+        <header><span class="yr">1998</span><span class="who">Dechow, Kothari, Watts · АНУ, 1963–1992</span></header>
+        <p class="metric-l">Таамаглалын алдаа, 1 жил <em>(бага нь сайн)</em></p>
+        <div class="duel">
+          <div class="side earn"><span class="nm">Earnings</span><b>1.60</b></div>
+          <div class="track"><i class="mark"></i><span class="mid"></span></div>
+          <div class="side cash"><span class="nm">CFO</span><b>1.89</b></div>
+        </div>
+        <div class="minibars" data-mb='[["1 жил",1.89,1.60],["2 жил",2.06,1.59],["3 жил",2.10,1.65]]'></div>
+        <p class="verdict-l earn">Ирээдүйн CFO-г таамаглахдаа цэвэр ашиг давуу гарсан.</p>
+      </article>
+      <article class="card scorecard rv" data-win="cash">
+        <header><span class="yr">2023</span><span class="who">Albuquerque, Velez, Pinto · Европ, 2018–2021</span></header>
+        <p class="metric-l">Adjusted R², ирээдүйн CFO <em>(их нь сайн)</em></p>
+        <div class="duel">
+          <div class="side earn"><span class="nm">P&amp;L</span><b>79%</b></div>
+          <div class="track"><i class="mark"></i><span class="mid"></span></div>
+          <div class="side cash"><span class="nm">OCF</span><b>90%</b></div>
+        </div>
+        <div class="minibars r2" data-mb='[["Ирээдүйн CFO",90,79],["Хувьцааны үнэ",39,22]]'></div>
+        <p class="verdict-l cash">Ирээдүйн CFO-г таамаглахдаа түүхэн OCF давуу гарсан.</p>
+      </article>
+    </div>
+    <p class="lede rv" style="max-width:70ch">Эдгээр зөрүүтэй үр дүн нь судалгааны түүвэр, хугацаа, хувьсагчийн хэмжилт болон эконометрик загварын ялгаатай холбоотой байж болох бөгөөд аль нэг үзүүлэлтийг бүх нөхцөлд давуу гэж үзэх боломжгүй.</p>
+  </div>
+</section>
+
 <section class="slide" style="padding-top:20px">
   <div class="wrap">
     <div class="cmp" id="cmp">
@@ -1540,6 +1609,11 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
       </div>
 
       <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">51 / 60</span><h3>7.4 СУДАЛГААНЫ ТҮҮВЭР БА ӨГӨГДӨЛ</h3></div>
+      <div class="row unitrow">
+        <div class="s1"><h5>1 цэг = 1 компани · 1 ажиглалт</h5><div class="units"><figure><canvas data-n="1337" data-c="earn"></canvas><figcaption><b>1,337</b> компани</figcaption></figure><figure><canvas data-n="22776" data-c="earn"></canvas><figcaption><b>22,776</b> ажиглалт</figcaption></figure></div></div>
+        <div class="s2"><h5>1 цэг = 1 компани · 1 тайлан</h5><div class="units"><figure><canvas data-n="121" data-c="cash"></canvas><figcaption><b>121</b> компани</figcaption></figure><figure><canvas data-n="484" data-c="cash"></canvas><figcaption><b>484</b> тайлан</figcaption></figure></div></div>
+      </div>
+
       <div class="row">
         <div class="s1"><h5>4. СУДАЛГААНЫ ТҮҮВЭР БА ӨГӨГДӨЛ</h5><div class="tiles" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,104px),1fr))"><div class="tile earn" style="padding:14px"><b style="font-size:24px">1,337</b><span>Компани</span></div><div class="tile earn" style="padding:14px"><b style="font-size:24px">22,776</b><span>Ажиглалт</span></div><div class="tile" style="padding:14px"><b style="font-size:20px">1963–1992</b><span>Хугацаа</span></div></div>
           <ul><li><b>Компани:</b> 1,337.</li><li><b>Ажиглалт:</b> 22,776.</li><li><b>Хугацаа:</b> 1963–1992.</li><li><b>Эх сурвалж:</b> Compustat Annual Industrial болон Annual Research.</li><li>Компани бүрийн цэвэр ашиг, аккруэл, мөнгөн урсгалын эхний ялгаврын үзүүлэлтээр дор хаяж 10 ажиглалттай байх шаардлага тавьсан.</li><li>Хувьцааны хуваалт, капиталын өөрчлөлтөд тохируулж, хэт их хэлбэлзэлтэй дээд болон доод 1%-ийн ажиглалтыг хассан.</li></ul></div>
@@ -1644,6 +1718,13 @@ footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
 </main>
 <footer><div class="wrap">ADVANCED FINANCIAL MANAGEMENT · CHAPTER 2, 3 · 1-р баг</div></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrambleTextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script>window.__FX=!matchMedia("(prefers-reduced-motion: reduce)").matches&&!!(window.gsap&&window.ScrollTrigger&&window.Lenis);</script>
 <script>
 (function(){
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -1682,7 +1763,7 @@ $('#ratios').innerHTML=R.map(c=>`
 <section class="slide" id="${c.id}"><span class="sn">${c.sn} / 60</span><div class="wrap gap-l">
  <h2 class="h2 rv" style="font-size:clamp(26px,3.6vw,44px)">${esc(c.t)}</h2>
  <div class="stack">${c.rows.map(r=>`
-  <article class="ratio rv"><header>
+  <article class="ratio rv" id="ratio-${r[0].toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}"><header>
    <div><span class="lab">Үзүүлэлт</span><h4>${esc(r[0])}</h4></div>
    <div><span class="lab">Томьёо</span><div class="fml">${fracify(r[1])}</div></div>
    <div><span class="lab">Юуг илтгэх вэ?</span><p class="mean">${esc(r[2])}</p></div></header>
@@ -1694,6 +1775,8 @@ $('#ratios').innerHTML=R.map(c=>`
  </div></div></section>`).join('');
 
 /* ---------- decision matrix (slide 24) ---------- */
+const IND={'DSO':'#ratio-dso','Inventory turnover':'#ratio-inventory-turnover','Current Ratio':'#ratio-current-ratio','Quick Ratio':'#ratio-quick-ratio','TIE':'#ratio-tie','ROA':'#ratio-roa','Total Assets Turnover':'#ratio-total-assets-turnover','P/E':'#ratio-p-e','P/FCF':'#ratio-p-fcf','Market/Book':'#ratio-market-book','DuPont':'#ch3','NOPAT':'#fcf','WACC':'#roic','FCF':'#fcf'};
+const inds=s=>s.split(', ').map(t=>IND[t]?`<a class="ind" href="${IND[t]}">${esc(t)}</a>`:esc(t)).join(', ');
 const D=[
  ['Борлуулалт өссөн ч авлага хуримтлагдах','DSO, авлагын насжилт, OCF','Зээлийн нөхцөл, цуглуулалтын бодлогыг шинэчлэх'],
  ['Бараа материал хэт өсөх','Inventory turnover, нөөцийн насжилт, FCF','Худалдан авалт ба нөөцийн хэмжээг тохируулах'],
@@ -1706,7 +1789,7 @@ const D=[
  ['Хүүгийн зардал нэмэгдэж, ашигт ажиллагаа буурах','TIE, Interest Expense Ratio, Operating Profit Margin','Өрийн бүтцийг дахин тохируулах, өндөр хүүтэй зээлийг бууруулах, санхүүжилтийн өртгийг бууруулах'],
  ['Үйл ажиллагааны зардал борлуулалтаас хурдан өсөх','Operating Expense Ratio, Operating Profit Margin','Зардлын хяналт тогтоох, үр ашиг багатай үйл ажиллагааг оновчлох'],
  ['Хувьцааны зах зээлийн үнэ ашиг, мөнгөн урсгалын өсөлтөөс хурдан нэмэгдэх','P/E, P/FCF, Market/Book','Хувьцааны үнэлгээ хэт өссөн эсэхийг шалгах, хөрөнгө оруулалтын эрсдэлийг дахин үнэлэх']];
-$('#dec').insertAdjacentHTML('beforeend',D.map(r=>`<div class="row"><div class="c1"><span class="ml">Илэрсэн нөхцөл</span>${esc(r[0])}</div><div class="c2"><span class="ml">Шинжлэх үзүүлэлт</span>${esc(r[1])}</div><div class="c3"><span class="ml">Боломжит шийдвэр</span>${esc(r[2])}</div></div>`).join(''));
+$('#dec').insertAdjacentHTML('beforeend',D.map(r=>`<div class="row"><div class="c1"><span class="ml">Илэрсэн нөхцөл</span>${esc(r[0])}</div><div class="c2"><span class="ml">Шинжлэх үзүүлэлт</span>${inds(r[1])}</div><div class="c3"><span class="ml">Боломжит шийдвэр</span>${esc(r[2])}</div></div>`).join(''));
 
 /* ---------- horizontal bars ---------- */
 function hbar(id,rows,{min=0,max,fmt=v=>v}={}){
@@ -1840,7 +1923,7 @@ $$('[data-replay]').forEach(b=>b.addEventListener('click',()=>{const el=document
 const vh=innerHeight;
 const anims=$$('.rv');const bars=[...$$('.chartbars'),...$$('[data-bars]')];const cancels=$$('.cancel');const casc=$('#cascade');
 if('IntersectionObserver' in window && !RM){
-  anims.forEach(e=>{if(e.getBoundingClientRect().top>vh*0.92)e.classList.add('pre')});
+  if(!window.__FX)anims.forEach(e=>{if(e.getBoundingClientRect().top>vh*0.92)e.classList.add('pre')});
   bars.forEach(e=>{if(e.getBoundingClientRect().top>vh)e.classList.add('pending');else e.classList.remove('pending')});
   cancels.forEach(e=>{if(e.getBoundingClientRect().top<vh)e.classList.add('go')});
   if(casc&&casc.getBoundingClientRect().top>vh)[...casc.children].forEach(c=>c.style.transform='scaleX(0)');
@@ -1879,6 +1962,291 @@ function frame(now){const t=(now-t0)/1000;cx.clearRect(0,0,W,H);
 size();addEventListener('resize',()=>{size();if(RM)frame(t0+4000)});
 if(RM)frame(t0+4000);else raf=requestAnimationFrame(frame);
 new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis&&!RM){cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}}).observe(hero);
+})();
+</script>
+
+<style>
+/* ---------- motion + presenter + new viz ---------- */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+
+/* chapter stripe wipe (Sui-like) */
+.stripes{position:absolute;left:0;right:0;top:0;height:clamp(90px,14vw,190px);display:flex;gap:0;z-index:0;pointer-events:none;overflow:hidden}
+.stripes i{flex:1;transform-origin:top;background:linear-gradient(180deg,var(--sc,#2563ff),transparent);opacity:.9}
+.chapter .wrap{position:relative;z-index:1}
+
+/* word scrub */
+.wfx .word{opacity:var(--wo,1)}
+
+/* side rail */
+.rail{position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:40;display:grid;gap:10px;justify-items:end;opacity:0;transition:opacity .4s;pointer-events:none}
+.rail.show{opacity:1;pointer-events:auto}
+.rail a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--muted);font:500 11px/1 var(--f-mono)}
+.rail a span{opacity:0;transform:translateX(6px);transition:opacity .25s,transform .25s;white-space:nowrap;background:var(--surface);border:1px solid var(--line);padding:5px 8px;border-radius:6px;color:var(--fg)}
+.rail a:hover span,.rail a:focus-visible span{opacity:1;transform:none}
+.rail a i{width:8px;height:8px;border-radius:2px;background:var(--line);transition:background .3s,height .3s}
+.rail a.on i{background:var(--cash);height:22px}
+.rail .cnt{font:600 11px/1 var(--f-mono);color:var(--cash);margin-top:6px;font-variant-numeric:tabular-nums}
+.onDark .rail a i{background:rgba(255,255,255,.25)}
+@media (max-width:1240px){.rail{display:none}}
+
+/* presenter button + hint */
+.pbtn{margin-top:14px;display:flex;align-items:center;gap:8px;font:500 12.5px/1 var(--f-body);color:var(--deep-fg);background:color-mix(in srgb,var(--deep) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:9px 13px;cursor:pointer}
+.pbtn kbd{font:600 11px/1 var(--f-mono);padding:3px 6px;border-radius:5px;background:rgba(255,255,255,.12)}
+.pbtn.on{background:var(--cash);border-color:var(--cash)}
+
+.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--cash) 45%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+
+/* simulator */
+.simgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+.simgrid>*{min-width:0}
+@media (max-width:980px){.simgrid{grid-template-columns:1fr}}
+.simstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.simstats .tile b{font-size:clamp(24px,2.6vw,34px)}
+.simstats em{font-style:normal;color:var(--faint);font-size:12.5px}
+.simbtns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 14px/1 var(--f-body);padding:11px 14px;border-radius:999px;border:1px solid var(--cash);background:var(--cash);color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--cash)}
+.btn:hover{filter:brightness(1.08)}
+#simchart .ann{font:600 12px var(--f-mono)}
+
+/* scoreboard */
+.scoregrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+@media (max-width:860px){.scoregrid{grid-template-columns:1fr}}
+.scorecard{display:grid;gap:16px}
+.scorecard header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.scorecard .yr{font:600 clamp(40px,5vw,64px)/1 var(--f-display);letter-spacing:-.05em}
+.scorecard[data-win="earn"] .yr{color:var(--earn)} .scorecard[data-win="cash"] .yr{color:var(--cash)}
+.scorecard .who{font:500 12.5px/1.4 var(--f-mono);color:var(--muted)}
+.metric-l{font-size:14.5px;color:var(--muted)} .metric-l em{font-style:normal;color:var(--faint)}
+.duel{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.duel .side{display:grid;gap:4px;text-align:center}
+.duel .side .nm{font:600 12px/1 var(--f-mono);color:var(--muted)}
+.duel .side b{font:600 clamp(22px,2.4vw,30px)/1 var(--f-display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.duel .side.earn b{color:var(--earn)} .duel .side.cash b{color:var(--cash)}
+.duel .track{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,var(--earn),color-mix(in srgb,var(--line) 70%,transparent) 50%,var(--cash))}
+.duel .mid{position:absolute;left:50%;top:-6px;bottom:-6px;width:2px;background:var(--faint);transform:translateX(-50%)}
+.duel .mark{position:absolute;top:50%;left:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--surface);border:3px solid var(--fg);box-shadow:0 4px 14px rgba(0,0,0,.18);transition:left 1.2s cubic-bezier(.2,.8,.2,1)}
+.minibars{display:grid;gap:8px}
+.minibars .r{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.minibars .bb{display:grid;gap:3px}
+.minibars .bb div{display:grid;grid-template-columns:minmax(0,1fr) 104px;align-items:center;gap:10px}
+.minibars .bb .tk{display:block;min-width:0}
+.minibars .bb i{height:9px;border-radius:5px;display:block;transform-origin:left;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.minibars .bb small{font:600 11.5px/1 var(--f-mono);color:var(--fg)}
+.minibars.pending .bb i{transform:scaleX(0)}
+.verdict-l{font:600 16px/1.45 var(--f-display);padding:12px 14px;border-radius:12px}
+.verdict-l.earn{background:var(--earn-soft);color:var(--earn)} .verdict-l.cash{background:var(--cash-soft);color:var(--cash)}
+
+/* unit dots */
+.cmp .row.unitrow{align-items:start}
+.unitrow h5{margin:0}
+.units{display:grid;gap:18px}
+.units figure{margin:0;display:grid;gap:8px;min-width:0}
+.units .udots{display:block}
+.units figcaption{font-size:13.5px;color:var(--muted)} .units figcaption b{font:600 18px var(--f-display);color:var(--fg);letter-spacing:-.02em}
+
+/* decision matrix links */
+.dec .ind{color:inherit;text-decoration:none;border-bottom:1.5px dotted currentColor}
+.dec .ind:hover{background:var(--cash-soft)}
+.dec .row.on{background:color-mix(in srgb,var(--cash) 7%,transparent)}
+
+@media (prefers-reduced-motion:reduce){.duel .mark,.minibars .bb i{transition:none}}
+@media print{.rail,.pbtn,.stripes{display:none!important}.minibars.pending .bb i{transform:none}}
+</style>
+
+<script>
+/* ===== Motion (Sui-style), data stories (Pudding-style), presenter mode ===== */
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FX=!!window.__FX;
+const below=el=>el.getBoundingClientRect().top>innerHeight*0.92;
+const tok=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/* guaranteed "seen" queue: fires once an element reaches the reading line OR is already above it (jumps, anchors, restored scroll) */
+const pend=[];let rvq=[];
+function check(){const lim=innerHeight*0.9;for(let i=0;i<pend.length;i++){const p=pend[i];if(p.done)continue;if(p.el.getBoundingClientRect().top<lim){p.done=true;p.fn()}}
+  if(rvq.length&&window.gsap){const a=rvq;rvq=[];const past=a.filter(e=>e.getBoundingClientRect().bottom<0),now=a.filter(e=>e.getBoundingClientRect().bottom>=0);
+    if(past.length)gsap.set(past,{opacity:1,y:0,overwrite:true});
+    if(now.length){gsap.to(now,{opacity:1,y:0,duration:.95,ease:'power3.out',stagger:{each:.08,amount:Math.min(.6,now.length*.08)},overwrite:true});setTimeout(()=>gsap.set(now,{opacity:1,y:0,overwrite:true}),2200)}}}
+const onEnter=(el,fn)=>{if(!FX){fn();return}pend.push({el,fn});};
+if(FX){addEventListener('scroll',check,{passive:true});addEventListener('resize',check);setInterval(check,600);}
+
+/* anchors used by the decision matrix */
+const f1=$('#fcfstmt'); if(f1) f1.closest('section').id='fcf';
+const f2=$('#roicsec'); if(f2) f2.closest('section').id='roic';
+
+/* ---------- 1. Simulator: Dechow, Kothari & Watts (1998) model ---------- */
+(function(){
+  const svg=$('#simchart'); if(!svg) return;
+  const ids={p:'simP',a:'simA',c:'simC',b:'simB'}; const DEF={p:4.95,a:15,c:16,b:7};
+  let seed=11;
+  const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+  const gauss=r=>{let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+  function run(P,n,sd){const r=rng(sd);const S=[100];for(let t=1;t<=n;t++)S.push(S[t-1]+gauss(r)*6);
+    const lev=S.map(s=>P.a*s+(P.c-P.b)*(1-P.p)*s);const E=S.map(s=>P.p*s);const A=[0],C=[E[0]];
+    for(let t=1;t<=n;t++){A.push(lev[t]-lev[t-1]);C.push(E[t]-A[t])}return{E,A,C}}
+  const diff=x=>x.slice(1).map((v,i)=>v-x[i]);
+  const sd=x=>{const m=x.reduce((a,b)=>a+b,0)/x.length;return Math.sqrt(x.reduce((a,b)=>a+(b-m)**2,0)/(x.length-1))};
+  const ac1=x=>{const m=x.reduce((a,b)=>a+b,0)/x.length;let num=0,den=0;for(let i=0;i<x.length;i++){den+=(x[i]-m)**2;if(i)num+=(x[i]-m)*(x[i-1]-m)}return num/den};
+  function params(){const o={};for(const k in ids){const v=+$('#'+ids[k]).value;o[k]=v/100;$('#'+ids[k]+'o').textContent=(k==='p'?v.toFixed(2):v)+'%'}return o}
+  function draw(animate){
+    const P=params();
+    const long=run(P,4000,seed+1000), dE=diff(long.E), dC=diff(long.C);
+    const sE=sd(dE), sC=sd(dC);
+    $('#sdE').textContent=sE.toFixed(2); $('#sdC').textContent=sC.toFixed(2);
+    $('#ratioEC').textContent=(sC/sE).toFixed(1)+'×'; $('#acC').textContent=ac1(dC).toFixed(2);
+    const {E,A,C}=run(P,30,seed);
+    const W=720,H=330,L=44,R=74,T=18,B=34; const n=E.length;
+    const all=[...E,...C,...A,0]; let lo=Math.min(...all), hi=Math.max(...all); const pad=(hi-lo)*.08; lo-=pad; hi+=pad;
+    const x=i=>L+i*(W-L-R)/(n-1), y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+    const step=(hi-lo)>12?4:(hi-lo)>6?2:1; let g='';
+    for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step) g+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+    [0,10,20,30].forEach(t=>g+=`<text x="${x(t)}" y="${H-10}" text-anchor="middle">${t===0?'Жил 0':t}</text>`);
+    const bw=(W-L-R)/(n-1)*.55;
+    A.forEach((v,i)=>{if(!i)return;const y0=y(0),y1=y(v);g+=`<rect class="abar" x="${x(i)-bw/2}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.max(1,Math.abs(y1-y0))}" rx="2" style="fill:var(--accr);opacity:.35"/>`});
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" style="stroke:var(--faint);stroke-width:1"/>`;
+    const path=a=>'M'+a.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('L');
+    g+=`<path class="lc simline" d="${path(C)}" style="stroke:var(--cash)"/>`;
+    g+=`<path class="lc simline" d="${path(E)}" style="stroke:var(--earn)"/>`;
+    g+=`<text class="ann" x="${W-R+8}" y="${y(C[n-1])+4}" style="fill:var(--cash)">CFO</text>`;
+    g+=`<text class="ann" x="${W-R+8}" y="${y(E[n-1])+(Math.abs(y(E[n-1])-y(C[n-1]))<14?16:4)}" style="fill:var(--earn)">Earnings</text>`;
+    svg.innerHTML=g;
+    if(animate&&FX&&window.DrawSVGPlugin){gsap.fromTo($$('.simline',svg),{drawSVG:'0%'},{drawSVG:'100%',duration:1.6,ease:'power2.inOut',stagger:.15});gsap.from($$('.abar',svg),{scaleY:0,transformOrigin:'50% 100%',duration:.6,stagger:.02,delay:.3})}
+  }
+  Object.values(ids).forEach(id=>$('#'+id).addEventListener('input',()=>draw(false)));
+  $('#simRoll').addEventListener('click',()=>{seed=(seed*16807+13)%2147483647;draw(true)});
+  $('#simReset').addEventListener('click',()=>{for(const k in ids)$('#'+ids[k]).value=DEF[k];draw(true)});
+  draw(false);
+  if(FX) onEnter(svg,()=>draw(true));
+})();
+
+/* ---------- 2. Scoreboard ---------- */
+$$('.minibars').forEach(mb=>{
+  const rows=JSON.parse(mb.dataset.mb), r2=mb.classList.contains('r2'), max=r2?100:2.4;
+  const n1=r2?'OCF':'CFO', n2=r2?'P&L':'Earnings', f=v=>r2?v+'%':v.toFixed(2);
+  mb.innerHTML=rows.map(r=>`<div class="r"><span>${r[0]}</span><div class="bb"><div><span class="tk"><i style="width:${r[1]/max*100}%;background:var(--cash)"></i></span><small>${n1} ${f(r[1])}</small></div><div><span class="tk"><i style="width:${r[2]/max*100}%;background:var(--earn)"></i></span><small>${n2} ${f(r[2])}</small></div></div></div>`).join('');
+  if(FX&&below(mb)){mb.classList.add('pending');onEnter(mb,()=>mb.classList.remove('pending'))}
+});
+$$('.scorecard').forEach(c=>{const m=$('.mark',c);const target=c.dataset.win==='earn'?'18%':'82%';
+  if(FX&&below(c)){onEnter(c,()=>setTimeout(()=>m.style.left=target,350))}else m.style.left=target});
+
+/* ---------- 3. Unit dots: 1 dot = 1 company / observation ---------- */
+let uid=0;
+const units=$$('.units canvas').map(cv=>{const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');sv.setAttribute('class','udots');sv.setAttribute('aria-hidden','true');sv.dataset.n=cv.dataset.n;sv.dataset.c=cv.dataset.c;sv.dataset.id='u'+(uid++);cv.replaceWith(sv);return sv});
+function drawUnits(sv,progress){
+  const n=+sv.dataset.n, cell=3, dot=2, id=sv.dataset.id;
+  const w=Math.floor(sv.parentElement.clientWidth); if(!w||w<60) return; const cols=Math.max(1,Math.floor(w/cell)); const rows=Math.ceil(n/cols);
+  const k=Math.round(n*progress), full=Math.floor(k/cols), rest=k-full*cols, col=sv.dataset.c==='earn'?'var(--earn)':'var(--cash)';
+  sv.setAttribute('viewBox',`0 0 ${cols*cell} ${rows*cell}`);sv.setAttribute('width',cols*cell);sv.setAttribute('height',rows*cell);sv.style.cssText=`display:block;width:${cols*cell}px;height:${rows*cell}px;max-width:100%`;
+  sv.innerHTML=`<defs><pattern id="${id}" width="${cell}" height="${cell}" patternUnits="userSpaceOnUse"><rect width="${dot}" height="${dot}" style="fill:${col}"/></pattern></defs>`+
+    (full?`<rect x="0" y="0" width="${cols*cell}" height="${full*cell}" fill="url(#${id})"/>`:'')+
+    (rest?`<rect x="0" y="${full*cell}" width="${rest*cell}" height="${cell}" fill="url(#${id})"/>`:'');
+}
+units.forEach(sv=>{
+  drawUnits(sv,1);
+  if(FX&&below(sv)){drawUnits(sv,0);onEnter(sv,()=>{const o={p:0};gsap.to(o,{p:1,duration:1.6,ease:'power2.out',onUpdate:()=>drawUnits(sv,o.p),onComplete:()=>drawUnits(sv,1)});setTimeout(()=>drawUnits(sv,1),2200)})}
+});
+let rT;addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(()=>units.forEach(sv=>drawUnits(sv,1)),150)});
+
+/* ---------- 4. Decision matrix: indicators jump to their card ---------- */
+document.addEventListener('click',e=>{const a=e.target.closest('.dec .ind');if(!a)return;e.preventDefault();
+  const t=document.querySelector(a.getAttribute('href'));if(!t)return;go(t);setTimeout(()=>{t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')},900)});
+$$('.dec .row').forEach(r=>{r.addEventListener('mouseenter',()=>r.classList.add('on'));r.addEventListener('mouseleave',()=>r.classList.remove('on'))});
+
+/* ---------- 5. Smooth scroll + GSAP scroll effects ---------- */
+let lenis=null;
+function go(el){const y=el.getBoundingClientRect().top+scrollY-58;if(lenis)lenis.scrollTo(y,{duration:1.15});else scrollTo({top:y,behavior:RM?'auto':'smooth'})}
+if(FX){
+  gsap.registerPlugin(ScrollTrigger);['SplitText','ScrambleTextPlugin','DrawSVGPlugin'].forEach(p=>window[p]&&gsap.registerPlugin(window[p]));
+  document.documentElement.style.scrollBehavior='auto';
+  lenis=new Lenis({lerp:.1,wheelMultiplier:1,anchors:{offset:-58}});
+  lenis.on('scroll',ScrollTrigger.update); gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
+
+  // hero intro + scroll-away
+  gsap.from('.hero h1 span',{yPercent:70,opacity:0,duration:1.2,ease:'power4.out',stagger:.14,delay:.1});
+  setTimeout(()=>gsap.set('.hero h1 span, .hero .team > *',{clearProps:'opacity,transform'}),2500);
+  gsap.from('.hero .team > *',{y:14,opacity:0,duration:.7,ease:'power3.out',stagger:.05,delay:.6});
+  if(window.ScrambleTextPlugin){const k=$('.hero .kicker'),kt=k.textContent;setTimeout(()=>{k.textContent=kt},2200);gsap.to(k,{duration:1.4,delay:.2,scrambleText:{text:k.textContent,chars:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·',speed:.6}})}
+  gsap.to('.hero .wrap',{yPercent:-22,opacity:.15,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+
+  // reveal everything below the fold in staggered batches
+  const rvs=$$('.rv').filter(below); gsap.set(rvs,{opacity:0,y:38});
+  rvs.forEach(el=>onEnter(el,()=>rvq.push(el)));
+
+  // chapter bands: stripe wipe + giant numeral
+  const blues=['#2563ff','#4da2ff','#1b3fae','#9fd0ff','#3b7bff','#123a7a'];
+  $$('.chapter').forEach(ch=>{
+    const s=document.createElement('div');s.className='stripes';s.setAttribute('aria-hidden','true');
+    for(let i=0;i<36;i++){const b=document.createElement('i');b.style.setProperty('--sc',blues[i%blues.length]);b.style.height=(40+((i*37)%60))+'%';s.appendChild(b)}
+    ch.prepend(s);
+    gsap.fromTo(s.children,{scaleY:0},{scaleY:1,ease:'none',stagger:{each:.012,from:'random'},scrollTrigger:{trigger:ch,start:'top bottom',end:'top 15%',scrub:true}});
+    gsap.to(s,{opacity:0,ease:'none',scrollTrigger:{trigger:ch,start:'top 15%',end:'top -25%',scrub:true}});
+    const cn=$('.cn',ch); if(cn) gsap.fromTo(cn,{yPercent:35,opacity:0,scale:.85},{yPercent:0,opacity:1,scale:1,ease:'none',scrollTrigger:{trigger:ch,start:'top 80%',end:'top 25%',scrub:true}});
+  });
+
+  // statement sentences: words light up as you read
+  if(window.SplitText){
+    $$('.chapter > .wrap > p:not(.kicker), .chapter .q, .ask p, #fcfstmt, #valstmt, .finale .bul p').forEach(el=>{
+      const st=new SplitText(el,{type:'words',wordsClass:'word'}); el.classList.add('wfx');
+      gsap.fromTo(st.words,{opacity:.16},{opacity:1,ease:'none',stagger:.1,scrollTrigger:{trigger:el,start:'top 85%',end:'bottom 45%',scrub:true}});
+    });
+  }
+
+  // mono labels decode into place
+  if(window.ScrambleTextPlugin){
+    $$('.eyebrow, .kicker, .span, .paper .meta small, .scorecard .who').filter(el=>below(el)&&el.children.length===0).forEach(el=>{
+      const txt=el.textContent;
+      onEnter(el,()=>(setTimeout(()=>{el.textContent=txt},1800),gsap.to(el,{duration:1.1,scrambleText:{text:txt,chars:'АБВГДЕЖЗИКЛМНОӨПРСТУҮХЦШЭЯ0123456789',revealDelay:.2,speed:.55}})));
+    });
+  }
+
+  // number tiles count up to their exact value
+  $$('.tile b').filter(b=>!b.id&&/^\d[\d,]*(\.\d+)?%?$/.test(b.textContent.trim())&&below(b)).forEach(b=>{
+    const txt=b.textContent.trim(), pct=txt.endsWith('%'), num=parseFloat(txt.replace(/[,%]/g,'')), dec=(txt.split('.')[1]||'').replace('%','').length, comma=txt.includes(',');
+    const fmt=v=>{let s=v.toFixed(dec);if(comma)s=Number(s).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});return s+(pct?'%':'')};
+    b.textContent=fmt(0);
+    onEnter(b,()=>{setTimeout(()=>{b.textContent=txt},2000);const o={v:0};gsap.to(o,{v:num,duration:1.5,ease:'power2.out',onUpdate:()=>b.textContent=fmt(o.v),onComplete:()=>b.textContent=txt})});
+  });
+
+  // chart lines draw themselves
+  if(window.DrawSVGPlugin) $$('#c32 .lc').forEach(p=>{if(!below(p))return;gsap.set(p,{drawSVG:'0%'});onEnter(p.closest('svg'),()=>gsap.to(p,{drawSVG:'100%',duration:1.6,ease:'power2.inOut'}))});
+
+  // correlations: "reality" dots travel from the model's prediction to the actual value
+  $$('.dumb .r').forEach(r=>{const act=$('.pt.act',r),pred=$('.pt.pred2',r)||$('.pt.pred',r);if(!act||!pred||!below(r))return;
+    const target=act.style.left;act.style.transition='none';act.style.left=pred.style.left;void act.offsetWidth;act.style.transition='';
+    onEnter(r,()=>setTimeout(()=>act.style.left=target,250))});
+
+  lenis.on('scroll',check);addEventListener('load',()=>{ScrollTrigger.refresh();check()});check();
+}
+
+/* ---------- 6. Side rail + presenter mode ---------- */
+const chapters=$$('.chapter[id^="ch"]');
+const rail=document.createElement('nav');rail.className='rail';rail.setAttribute('aria-label','Бүлгийн явц');
+const navTxt=$$('#navlist a').map(a=>a.textContent);
+rail.innerHTML=chapters.map((c,i)=>`<a href="#${c.id}"><span>${navTxt[i]||c.id}</span><i></i></a>`).join('')+'<div class="cnt" id="railcnt"></div>';
+document.body.appendChild(rail);
+$$('a',rail).forEach(a=>a.addEventListener('click',e=>{e.preventDefault();go($(a.getAttribute('href')))}));
+const pbtn=document.createElement('button');pbtn.type='button';pbtn.className='pbtn';pbtn.innerHTML='<kbd>←</kbd><kbd>→</kbd><kbd>F</kbd>';pbtn.title='Илтгэх горим: ← → слайд солих, F дэлгэц дүүргэх';pbtn.setAttribute('aria-label','Илтгэх горим');
+rail.appendChild(pbtn);
+pbtn.addEventListener('click',()=>{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().catch(()=>{});else if(document.exitFullscreen&&document.fullscreenElement)document.exitFullscreen()});
+document.addEventListener('fullscreenchange',()=>pbtn.classList.toggle('on',!!document.fullscreenElement));
+
+const stops=()=>[$('header.hero'),...$$('main > section, main > #ratios > section, .cmpsec')].filter(Boolean).map(el=>({el,top:el.getBoundingClientRect().top+scrollY})).sort((a,b)=>a.top-b.top);
+function nav(dir){const s=stops(),y=scrollY+70;let i;if(dir>0){i=s.findIndex(o=>o.top>y+8)}else{i=-1;for(let k=s.length-1;k>=0;k--)if(s[k].top<y-30){i=k;break}}if(i>=0)go(s[i].el)}
+document.addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;const t=e.target;if(t.closest&&t.closest('input,textarea,select,[contenteditable]'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();nav(1)}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();nav(-1)}
+  else if(e.key==='f'||e.key==='F'){pbtn.click()}});
+
+const hero=$('header.hero');
+function railTick(){rail.classList.toggle('show',scrollY>hero.offsetHeight*.6);
+  let cur=-1;chapters.forEach((c,i)=>{if(c.getBoundingClientRect().top<innerHeight*.45)cur=i});$$('a',rail).forEach((a,i)=>a.classList.toggle('on',i===cur));
+  let sn='';$$('main section .sn, .cmpsec .sn').forEach(s=>{if(s.getBoundingClientRect().top<innerHeight*.5)sn=s.textContent});$('#railcnt').textContent=sn;
+  const el=document.elementFromPoint(innerWidth-24,innerHeight/2);document.body.classList.toggle('onDark',!!(el&&el.closest&&el.closest('.chapter,.hero')))}
+addEventListener('scroll',railTick,{passive:true});railTick();
 })();
 </script>
 
