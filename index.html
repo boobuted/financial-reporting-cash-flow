@@ -1,0 +1,1841 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Санхүүгийн тайлагнал ба мөнгөн урсгал · Advanced Financial Management, Chapter 2, 3 · 1-р баг">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Санхүүгийн тайлагнал ба мөнгөн урсгал</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: long-form scroll essay. Light reading canvas, deep-navy chapter bands with flowing "cash" light.
+   Blue = cash flow (OCF/CFO), coral = earnings (P&L), teal = accruals, carried through every chart. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --fg:#0a1322; --muted:#566275; --faint:#8a95a6; --line:#e1e6ee; --chip:#edf1f8;
+  --cash:#2563ff; --cash-soft:#dbe6ff; --earn:#ef5a2f; --earn-soft:#ffe3d9; --accr:#0d9a8a; --accr-soft:#d5f2ee;
+  --deep:#040c1a; --deep-2:#0a1a33; --deep-fg:#eef3ff; --deep-muted:#93a3c0; --glow:#4da2ff;
+  --pos:#0d9a6a; --neg:#d23c3c;
+  --f-display:"Inter Tight","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:18px; --navh:52px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#070a11; --surface:#0e141f; --fg:#e8edf6; --muted:#9aa6b9; --faint:#6c7789; --line:#1f2836; --chip:#141c2a;
+  --cash:#5b8dff; --cash-soft:#14244a; --earn:#ff7a52; --earn-soft:#3a1c12; --accr:#2cc4b2; --accr-soft:#0f2e2b;
+  --pos:#35c48f; --neg:#ff6b6b; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#070a11; --surface:#0e141f; --fg:#e8edf6; --muted:#9aa6b9; --faint:#6c7789; --line:#1f2836; --chip:#141c2a;
+  --cash:#5b8dff; --cash-soft:#14244a; --earn:#ff7a52; --earn-soft:#3a1c12; --accr:#2cc4b2; --accr-soft:#0f2e2b;
+  --pos:#35c48f; --neg:#ff6b6b; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--navh) + 12px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--fg);font:400 17px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--deep)}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.02em}
+p{margin:0}
+a{color:var(--cash)}
+:focus-visible{outline:2px solid var(--cash);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.narrow{max-width:760px}
+.mono{font-family:var(--f-mono)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- top nav ---------- */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;height:var(--navh);
+  background:color-mix(in srgb,var(--deep) 82%,transparent);backdrop-filter:saturate(1.6) blur(18px);-webkit-backdrop-filter:saturate(1.6) blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.07);transform:translateY(-110%);transition:transform .4s ease}
+.nav.show{transform:none}
+.nav .wrap{height:100%;display:flex;align-items:center;gap:18px;max-width:none}
+.nav .brand{font:600 13px/1 var(--f-display);color:var(--deep-fg);white-space:nowrap;letter-spacing:-.01em}
+.nav ol{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.nav ol::-webkit-scrollbar{display:none}
+.nav a{display:block;padding:7px 11px;border-radius:999px;font:500 12.5px/1 var(--f-body);color:var(--deep-muted);text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.nav a:hover{color:var(--deep-fg)}
+.nav a.on{background:rgba(77,162,255,.16);color:#fff}
+.nav .bar{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:linear-gradient(90deg,var(--glow),#9fd0ff)}
+@media (max-width:700px){.nav .brand{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--deep);color:var(--deep-fg);overflow:hidden;isolation:isolate}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(80% 60% at 15% 100%,rgba(4,12,26,.9),transparent 60%),linear-gradient(180deg,rgba(4,12,26,.2),rgba(4,12,26,.85))}
+.hero .wrap{padding-block:clamp(72px,12vw,150px) clamp(56px,8vw,96px);display:grid;gap:28px}
+.kicker{font:600 12px/1.2 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--glow)}
+.hero h1{font-size:clamp(46px,8.4vw,112px);line-height:.98;font-weight:600;letter-spacing:-.045em;max-width:12ch}
+.hero h1 span{display:block;background:linear-gradient(92deg,#fff 10%,#a9d3ff 55%,#4da2ff 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.team{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:15px;color:var(--deep-muted)}
+.team b{color:#fff;font-weight:600;margin-right:4px}
+.team span{padding:6px 12px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:var(--deep-fg);background:rgba(255,255,255,.04)}
+.scrollcue{font:500 13px/1 var(--f-body);color:var(--deep-muted);display:flex;gap:10px;align-items:center}
+.scrollcue i{width:1px;height:34px;background:linear-gradient(var(--glow),transparent);display:block}
+
+/* ---------- sections ---------- */
+.slide{padding-block:clamp(64px,9vw,120px);position:relative}
+.slide + .slide{border-top:1px solid var(--line)}
+.sn{position:absolute;top:clamp(22px,3vw,34px);right:max(20px,env(safe-area-inset-right,0px));font:500 11px/1 var(--f-mono);color:var(--faint);letter-spacing:.08em}
+.eyebrow{font:600 12px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cash);margin-bottom:16px}
+.h2{font-size:clamp(30px,4.6vw,54px);line-height:1.05;font-weight:600;letter-spacing:-.035em;margin-bottom:22px}
+.h3{font-size:clamp(22px,2.6vw,30px);line-height:1.15;font-weight:600;letter-spacing:-.025em}
+.lede{font-size:clamp(18px,1.9vw,22px);line-height:1.55;color:var(--muted);max-width:62ch}
+.lede strong{color:var(--fg);font-weight:600}
+.stack{display:grid;gap:18px}
+.gap-l{display:grid;gap:clamp(36px,5vw,64px)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px}
+.grid2>*,.grid3>*,.grid4>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(20px,2.4vw,30px)}
+.muted{color:var(--muted)}
+.small{font-size:14px;line-height:1.55}
+ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.clean li{position:relative;padding-left:22px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--cash)}
+ul.clean.earn li::before{background:var(--earn)}
+ul.clean.accr li::before{background:var(--accr)}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:12px}
+ol.steps li{counter-increment:s;position:relative;padding-left:40px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--chip);color:var(--fg);font:600 12px/26px var(--f-mono);text-align:center}
+.fx{font-family:var(--f-mono);font-size:15px;line-height:1.55;background:var(--chip);border-radius:12px;padding:12px 16px;color:var(--fg);overflow-x:auto}
+.fx.big{font-size:clamp(16px,2vw,22px);padding:18px 22px;font-weight:500}
+.fx .en{display:block;color:var(--muted);font-size:.82em;margin-top:4px}
+.tag{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px/1 var(--f-mono);padding:7px 10px;border-radius:8px;background:var(--chip);color:var(--fg)}
+.key{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.key i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px}
+.note{font-size:13.5px;color:var(--faint);line-height:1.5}
+.callout{border-radius:var(--r);padding:clamp(20px,2.6vw,32px);background:linear-gradient(135deg,var(--cash-soft),transparent 75%),var(--surface);border:1px solid var(--line)}
+.callout.earn{background:linear-gradient(135deg,var(--earn-soft),transparent 75%),var(--surface)}
+.callout b.lbl{display:block;font:600 12px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cash);margin-bottom:10px}
+.callout.earn b.lbl{color:var(--earn)}
+.callout p{font-size:clamp(17px,1.7vw,20px);line-height:1.55}
+
+/* ---------- chapter bands ---------- */
+.chapter{background:var(--deep);color:var(--deep-fg);position:relative;overflow:hidden;isolation:isolate}
+.chapter::before{content:"";position:absolute;inset:-20% -10% auto auto;width:70%;height:140%;z-index:-1;
+  background:radial-gradient(closest-side,rgba(77,162,255,.30),rgba(37,99,255,.10) 55%,transparent);filter:blur(10px)}
+.chapter .wrap{padding-block:clamp(80px,11vw,150px);display:grid;gap:22px}
+.chapter .cn{font:500 clamp(80px,14vw,180px)/.8 var(--f-display);letter-spacing:-.06em;background:linear-gradient(180deg,#9fd0ff,rgba(77,162,255,.1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chapter h2{font-size:clamp(34px,5.6vw,72px);line-height:1.02;font-weight:600;letter-spacing:-.04em;max-width:16ch}
+.chapter p{color:var(--deep-muted);font-size:clamp(18px,1.9vw,22px);max-width:60ch;line-height:1.55}
+.chapter .q{color:#fff;font-family:var(--f-display);font-size:clamp(22px,2.8vw,34px);line-height:1.25;letter-spacing:-.02em;max-width:30ch;border-left:2px solid var(--glow);padding-left:20px}
+.chapter .sn{color:rgba(255,255,255,.35)}
+
+/* ---------- TOC ---------- */
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:14px}
+.toc a{display:grid;grid-template-columns:44px 1fr;gap:4px 14px;text-decoration:none;color:var(--fg);padding:20px 22px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);transition:border-color .2s,transform .2s}
+.toc a:hover{border-color:var(--cash);transform:translateY(-2px)}
+.toc .n{grid-row:span 2;font:600 28px/1 var(--f-display);color:var(--cash);letter-spacing:-.04em}
+.toc .t{font:600 17px/1.3 var(--f-display);letter-spacing:-.01em}
+.toc .s{font-size:13.5px;line-height:1.5;color:var(--muted)}
+.toc .s div{padding-top:3px}
+
+/* ---------- statements linkage (scrolly) ---------- */
+.scrolly{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,4vw,56px);align-items:start}
+.scrolly .stick{position:sticky;top:calc(var(--navh) + 24px)}
+.links{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(56px,7vw,92px) clamp(56px,7vw,92px)}
+.links svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.node{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 18px;position:relative;z-index:1;transition:border-color .35s,box-shadow .35s,opacity .35s}
+.node h4{font-size:16px;line-height:1.25;margin-bottom:8px;letter-spacing:-.01em}
+.node .f{font:500 12.5px/1.45 var(--f-mono);color:var(--muted)}
+.node.lit{border-color:var(--cash);box-shadow:0 0 0 4px color-mix(in srgb,var(--cash) 16%,transparent)}
+.links.focus .node:not(.lit){opacity:.45}
+.links path{fill:none;stroke:var(--line);stroke-width:2;transition:stroke .35s}
+.links path.lit{stroke:var(--cash);stroke-dasharray:6 6;animation:flow 1s linear infinite}
+.links .badge circle{fill:var(--surface);stroke:var(--line);stroke-width:1.5;transition:fill .35s,stroke .35s}
+.links .badge text{font:600 12px var(--f-mono);fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+.links .badge.lit circle{fill:var(--cash);stroke:var(--cash)}
+.links .badge.lit text{fill:#fff}
+@keyframes flow{to{stroke-dashoffset:-12}}
+@media (prefers-reduced-motion:reduce){.links path.lit{animation:none}}
+.linklbl{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.linklbl span{font:500 12.5px/1.2 var(--f-mono);padding:7px 10px;border-radius:8px;background:var(--chip);color:var(--muted);transition:background .3s,color .3s}
+.linklbl span.lit{background:var(--cash);color:#fff}
+.stepcol{display:grid;gap:min(40vh,320px);padding-block:8vh 20vh}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;transition:border-color .3s,opacity .3s;opacity:.55}
+.step.on{opacity:1;border-color:var(--cash)}
+.step .i{font:600 13px/1 var(--f-mono);color:var(--cash);margin-bottom:10px;display:block}
+.step h4{font-size:18px;margin-bottom:8px;line-height:1.3}
+.step p{color:var(--muted);font-size:15.5px}
+@media (max-width:860px){
+  .scrolly{grid-template-columns:1fr}
+  .scrolly .stick{top:calc(var(--navh) + 8px);z-index:2;background:var(--bg);padding-block:8px}
+  .links{gap:44px 40px}
+  .node{padding:11px 11px 12px;border-radius:12px}
+  .node h4{font-size:13px;margin-bottom:4px}
+  .node .f{font-size:10.5px}
+  .linklbl{display:none}
+  .stepcol{gap:40vh;padding-block:4vh 30vh}
+}
+
+/* statement quad (slide 5) */
+.quad .card h3{font-size:20px;margin:10px 0 8px;letter-spacing:-.015em}
+.quad .card p{color:var(--muted);font-size:15.5px}
+.quad .when{font:600 11px/1 var(--f-mono);letter-spacing:.12em;color:var(--cash)}
+.quad .ico{width:44px;height:44px;border-radius:12px;background:var(--chip);display:grid;place-items:center;margin-bottom:6px}
+.quad .ico svg{width:24px;height:24px;stroke:var(--cash);fill:none;stroke-width:1.7}
+
+/* balance sheet */
+.bs{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2vw,24px);align-items:stretch}
+.bs .col{display:grid;gap:6px;min-width:0}
+.bs .blk{border-radius:14px;padding:16px;display:grid;align-content:space-between;gap:10px;min-height:120px}
+.bs .blk h4{font-size:17px}
+.bs .blk .sub{display:grid;gap:6px}
+.bs .blk .sub div{font-size:14px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.55);color:#0a1322}
+.bs .a{background:var(--cash);color:#fff;grid-row:span 2}
+.bs .l{background:var(--earn);color:#fff}
+.bs .e{background:var(--accr);color:#fff}
+.bs .cap{font:500 12px/1.3 var(--f-mono);color:var(--muted);padding:4px 2px}
+.bs .eq{display:grid;place-items:center;font:300 clamp(40px,6vw,72px)/1 var(--f-display);color:var(--faint)}
+.bs .assets{display:grid;grid-template-rows:1fr auto}
+.bs .assets .a{grid-row:auto}
+@media (max-width:600px){.bs{grid-template-columns:1fr}.bs .eq{transform:rotate(90deg);height:40px}}
+
+/* cascade (income statement schematic) */
+.cascade{display:grid;gap:8px;margin-top:6px}
+.cascade div{height:30px;border-radius:7px;display:flex;align-items:center;padding:0 10px;font:500 12.5px/1 var(--f-mono);color:#fff;white-space:nowrap;overflow:hidden;transform-origin:left;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+
+/* cash flow trio */
+.cf3 .card{display:grid;gap:14px;align-content:start}
+.cf3 .ix{font:600 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.06em}
+.cf3 h3{font-size:21px;letter-spacing:-.02em;line-height:1.2}
+.cf3 .ab{font:600 13px/1 var(--f-mono);color:var(--cash)}
+.io{display:grid;gap:8px}
+.io div{display:grid;grid-template-columns:28px 1fr;gap:8px;font-size:15px;line-height:1.45}
+.io b{font:600 16px/1.3 var(--f-mono);text-align:center;border-radius:6px}
+.io .in b{color:var(--pos);background:color-mix(in srgb,var(--pos) 14%,transparent)}
+.io .out b{color:var(--neg);background:color-mix(in srgb,var(--neg) 14%,transparent)}
+.merge{position:relative;height:90px;margin-top:-4px}
+.merge svg{width:100%;height:100%;display:block}
+.merge path{fill:none;stroke-width:2.4;stroke-linecap:round}
+
+/* versus */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(14px,2.4vw,28px);align-items:stretch}
+.vs>div{min-width:0}
+.vs .mid{display:grid;place-items:center;font:600 13px/1 var(--f-mono);color:var(--faint)}
+.vs .card h3{font-size:22px;margin-bottom:14px}
+.vs .card.c-earn{border-top:3px solid var(--earn)}
+.vs .card.c-cash{border-top:3px solid var(--cash)}
+@media (max-width:760px){.vs{grid-template-columns:1fr}.vs .mid{padding:2px}}
+
+/* chain */
+.chain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:c}
+.chain .card{display:grid;gap:10px;align-content:start}
+.chain .no{font:600 30px/1 var(--f-display);color:var(--cash);letter-spacing:-.04em}
+.chain .ttl{font:600 12px/1.3 var(--f-mono);letter-spacing:.09em;color:var(--muted)}
+.chain .fx{font-size:13.5px}
+.chain .en{font:400 13px/1.45 var(--f-mono);color:var(--faint)}
+@media (max-width:900px){.chain{grid-template-columns:1fr}}
+.pipe{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.pipe span{font:600 13.5px/1 var(--f-mono);padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.pipe span:last-child{background:var(--cash);color:#fff;border-color:var(--cash)}
+.pipe i{font-style:normal;color:var(--faint)}
+.sign{display:grid;gap:8px}
+.sign div{display:flex;gap:10px;align-items:baseline;font-size:15px}
+.sign b{font:600 13px/1 var(--f-mono);padding:5px 8px;border-radius:6px;white-space:nowrap}
+.sign .p b{background:color-mix(in srgb,var(--neg) 14%,transparent);color:var(--neg)}
+.sign .m b{background:color-mix(in srgb,var(--pos) 14%,transparent);color:var(--pos)}
+
+/* fraction */
+.frac{display:inline-grid;vertical-align:middle;text-align:center;font-family:var(--f-mono);line-height:1.3}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 6px 3px}
+.frac>span:last-child{padding:3px 6px 0}
+.metric{display:grid;gap:12px;align-content:start}
+.metric .ab{font:600 clamp(30px,3.4vw,40px)/1 var(--f-display);letter-spacing:-.04em;color:var(--cash)}
+.metric .nm{font-weight:600;font-size:17px;line-height:1.3}
+.metric .en{font-size:13.5px;color:var(--faint)}
+.metric .formula{display:flex;align-items:center;gap:10px;font:500 14px/1.3 var(--f-mono);padding:14px;background:var(--chip);border-radius:12px;flex-wrap:wrap}
+.metric p{color:var(--muted);font-size:15px}
+
+/* MVA / EVA */
+.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.eqrow .t{display:grid;gap:4px;padding:12px 14px;border-radius:12px;background:var(--chip);min-width:0}
+.eqrow .t b{font:600 14px/1.3 var(--f-mono)}
+.eqrow .t small{font-size:12.5px;color:var(--muted);line-height:1.35}
+.eqrow .op{font:500 22px/1 var(--f-display);color:var(--faint)}
+.eqrow .lhs{font:600 26px/1 var(--f-display);color:var(--cash);letter-spacing:-.03em}
+.span{font:600 11px/1 var(--f-mono);letter-spacing:.12em;color:var(--earn);margin:4px 0 2px}
+
+/* calculators */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:center}
+@media (max-width:820px){.calc{grid-template-columns:1fr}}
+.sl{display:grid;gap:8px}
+.sl label{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;font-weight:500}
+.sl output{font:600 14px var(--f-mono);color:var(--cash)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:var(--line);outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--surface);border:2px solid var(--cash);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:grab}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--cash);cursor:grab}
+.readout{display:grid;gap:10px;justify-items:start}
+.readout .big{font:600 clamp(48px,7vw,84px)/1 var(--f-display);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.readout .lbl{font:600 12px/1 var(--f-mono);letter-spacing:.1em;color:var(--muted)}
+.state{font-size:14.5px;padding:8px 12px;border-radius:10px;font-weight:500}
+.state.good{background:color-mix(in srgb,var(--pos) 14%,transparent);color:var(--pos)}
+.state.bad{background:color-mix(in srgb,var(--neg) 14%,transparent);color:var(--neg)}
+.factorbar{display:flex;height:12px;border-radius:99px;overflow:hidden;width:100%;background:var(--line)}
+.factorbar i{display:block;height:100%;transition:width .3s}
+
+/* tables */
+.tblwrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+table.t{border-collapse:collapse;width:100%;font-size:15px;line-height:1.5}
+table.t th{text-align:left;font:600 11.5px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 18px;border-bottom:1px solid var(--line);background:var(--chip);vertical-align:bottom}
+table.t td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr:last-child td{border-bottom:0}
+table.t tbody tr{transition:background .2s}
+table.t tbody tr:hover{background:color-mix(in srgb,var(--cash) 5%,transparent)}
+table.t td:first-child{font-weight:600}
+table.t .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+table.t.min{min-width:640px}
+
+/* ratio cards */
+.cat{display:grid;gap:10px;align-content:start}
+.cat .q{font-size:16px;line-height:1.45}
+.cat h4{font-size:15px;color:var(--cash);font-family:var(--f-mono);font-weight:600;letter-spacing:0}
+.ratio{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ratio header{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(0,1.3fr) minmax(0,1.2fr);gap:20px;padding:22px 24px;align-items:center}
+.ratio header>*{min-width:0}
+.ratio h4{font:600 20px/1.2 var(--f-display);letter-spacing:-.02em}
+.ratio .lab{display:block;font:600 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.ratio .fml{font:500 14px/1.4 var(--f-mono)}
+.ratio .fml .frac{font-size:13.5px}
+.ratio .mean{font-size:15px;color:var(--muted)}
+.ratio .states{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.ratio .st{padding:18px 24px;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.ratio .st+.st{border-left:1px solid var(--line)}
+.ratio .st .lab{display:flex;gap:6px;align-items:center}
+.ratio .st .ar{font-size:14px;line-height:1}
+.ratio .st.dn .ar{color:var(--neg)} .ratio .st.up .ar{color:var(--pos)}
+.ratio .st.dec{background:color-mix(in srgb,var(--cash) 5%,transparent);color:var(--fg)}
+.ratio .st.dec .lab{color:var(--cash)}
+@media (max-width:860px){.ratio header{grid-template-columns:1fr;gap:12px}.ratio .states{grid-template-columns:1fr}.ratio .st+.st{border-left:0;border-top:1px solid var(--line)}}
+
+/* DuPont */
+.dp{display:grid;grid-template-columns:repeat(5,auto);gap:12px;align-items:stretch;justify-content:start}
+.dp .f{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.dp .f b{font:600 15px/1.25 var(--f-display)}
+.dp .f .fml{font:500 13px/1.4 var(--f-mono);color:var(--cash)}
+.dp .f p{font-size:14px;color:var(--muted);line-height:1.45}
+.dp .x{display:grid;place-items:center;font:300 26px/1 var(--f-display);color:var(--faint)}
+.dp.five{grid-template-columns:repeat(9,auto)}
+@media (max-width:980px){.dp,.dp.five{grid-template-columns:1fr}.dp .x{height:22px}}
+.roe{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+.roe .pill{font:600 28px/1 var(--f-display);letter-spacing:-.03em;color:#fff;background:linear-gradient(135deg,var(--cash),#4da2ff);padding:14px 22px;border-radius:16px}
+.roe .down{font:400 22px/1 var(--f-display);color:var(--faint)}
+.cancel{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;font-family:var(--f-mono);font-size:clamp(13px,1.4vw,15px);padding:22px;border-radius:var(--r);background:var(--chip);overflow-x:auto}
+.cancel .lhs{font-weight:600;color:var(--cash)}
+.cancel .op{color:var(--faint)}
+.cancel s{text-decoration:none;position:relative;transition:color .4s .2s}
+.cancel s::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:var(--earn);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.cancel.go s{color:var(--faint)}
+.cancel.go s::after{transform:scaleX(1)}
+.cancel .res{opacity:.25;transition:opacity .6s .9s;display:inline-flex;align-items:center;gap:12px}
+.cancel.go .res{opacity:1}
+.cancel .res .frac{color:var(--cash);font-weight:600}
+.replay{font:500 13px/1 var(--f-body);color:var(--cash);background:none;border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
+
+/* decision list */
+.dec{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.dec .hd,.dec .row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.2fr);gap:20px;padding:16px 22px}
+.dec .hd{background:var(--chip);font:600 11.5px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dec .row{border-top:1px solid var(--line);font-size:15px;align-items:start}
+.dec .row:hover{background:color-mix(in srgb,var(--cash) 4%,transparent)}
+.dec .row .c1{font-weight:600}
+.dec .row .c2{font:500 13.5px/1.5 var(--f-mono);color:var(--cash)}
+.dec .row .c3{color:var(--muted)}
+.dec .row .ml{display:none;font:600 10px/1 var(--f-mono);letter-spacing:.1em;color:var(--faint);margin-bottom:5px;text-transform:uppercase}
+@media (max-width:760px){.dec .hd{display:none}.dec .row{grid-template-columns:1fr;gap:10px}.dec .row .ml{display:block}}
+
+/* paper heads */
+.paper{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:clamp(24px,4vw,56px);align-items:end}
+@media (max-width:860px){.paper{grid-template-columns:1fr}}
+.paper .meta{display:grid;gap:16px;border-top:1px solid rgba(255,255,255,.14);padding-top:18px}
+.paper .meta div{display:grid;gap:4px}
+.paper .meta small{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--glow)}
+.paper .meta span{color:#fff;font-size:16px;line-height:1.4}
+.paper .meta .yr{font:600 44px/1 var(--f-display);letter-spacing:-.04em}
+.chapter .ptitle{font-family:var(--f-display);font-size:clamp(30px,4.6vw,58px);line-height:1.05;letter-spacing:-.035em;font-weight:600;color:#fff;max-width:20ch}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:14px}
+.tile{padding:20px;border-radius:16px;background:var(--surface);border:1px solid var(--line);display:grid;gap:8px;align-content:start}
+.tile b{font:600 clamp(30px,3.6vw,44px)/1 var(--f-display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.tile span{font-size:14px;color:var(--muted);line-height:1.4}
+.tile.cash b{color:var(--cash)} .tile.earn b{color:var(--earn)} .tile.accr b{color:var(--accr)}
+
+/* charts */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,2.4vw,28px);display:grid;gap:14px;min-width:0}
+.chart h4{font:600 15px/1.35 var(--f-display);letter-spacing:-.01em}
+.chart .sub{font-size:13px;color:var(--faint);margin-top:-8px}
+.hb{display:grid;gap:10px}
+.hb .r{display:grid;grid-template-columns:minmax(90px,var(--lw,180px)) minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:14px}
+.hb .r .lb{line-height:1.3;color:var(--fg)}
+.hb .tr{position:relative;height:26px;border-radius:6px;background:color-mix(in srgb,var(--line) 55%,transparent)}
+.hb .bar{position:absolute;top:0;bottom:0;border-radius:6px;transform-origin:left;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.hb .zero{position:absolute;top:-4px;bottom:-4px;width:1.5px;background:var(--faint)}
+.hb .v{font:600 14px/1 var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.hb.pending .bar{transform:scaleX(0)}
+@media (max-width:520px){.hb .r{grid-template-columns:1fr 54px;gap:6px 10px}.hb .r .lb{grid-column:1/-1}}
+.svgchart{width:100%;height:auto;display:block;overflow:visible}
+.svgchart text{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.svgchart .grid{stroke:var(--line);stroke-width:1}
+.svgchart .lc{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.dumb{display:grid;gap:4px}
+.dumb .r{display:grid;grid-template-columns:minmax(0,var(--lw,300px)) minmax(0,1fr);gap:16px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.dumb .r:first-of-type{border-top:0}
+.dumb .lb{font-size:14px;line-height:1.35}
+.dumb .tr{position:relative;height:30px}
+.dumb .tr::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
+.dumb .z{position:absolute;top:2px;bottom:2px;width:1px;background:var(--faint);left:50%}
+.dumb .seg{position:absolute;top:50%;height:3px;margin-top:-1.5px;background:var(--faint);opacity:.5;border-radius:2px}
+.dumb .pt{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;transition:left 1s cubic-bezier(.2,.7,.2,1)}
+.dumb .pt.pred{background:var(--surface);border:2.5px solid var(--earn)}
+.dumb .pt.pred2{background:var(--surface);border:2.5px solid var(--cash)}
+.dumb .pt.act{background:var(--fg)}
+.dumb .pt span{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font:600 11px/1 var(--f-mono);white-space:nowrap;color:var(--muted)}
+.dumb .pt.act span{top:15px;bottom:auto;color:var(--fg)}
+.dumb .axis{display:grid;grid-template-columns:minmax(0,var(--lw,300px)) minmax(0,1fr);gap:16px}
+.dumb .axis div:last-child{display:flex;justify-content:space-between;font:500 11px/1 var(--f-mono);color:var(--faint)}
+@media (max-width:700px){.dumb .r,.dumb .axis{grid-template-columns:1fr;gap:4px}.dumb .axis div:first-child{display:none}.dumb .tr{margin-block:14px}}
+.coef{display:grid;grid-template-columns:minmax(120px,1.2fr) repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:14px}
+.coef>div{padding:12px 14px;border-top:1px solid var(--line);min-width:0}
+.coef>div:nth-child(-n+4){border-top:0;background:var(--chip);font:600 11.5px/1.3 var(--f-mono);letter-spacing:.06em;color:var(--muted)}
+.coef .cb{display:grid;gap:6px}
+.coef .cb b{font:600 15px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.coef .cb small{font:500 11.5px/1 var(--f-mono);color:var(--faint)}
+.coef .mini{position:relative;height:8px;border-radius:4px;background:color-mix(in srgb,var(--line) 60%,transparent)}
+.coef .mini i{position:absolute;top:0;bottom:0;border-radius:4px}
+.coef .mini u{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--faint)}
+@media (max-width:620px){.coef{font-size:12.5px}.coef>div{padding:10px 8px}}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--cash)}
+.dots i.f{background:var(--cash)}
+.lvl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.lvl:first-child{border-top:0}
+.big2{display:grid;gap:18px}
+.big2 .r{display:grid;gap:8px}
+.big2 .r .top{display:flex;justify-content:space-between;gap:12px;font-size:15px;font-weight:500}
+.big2 .r .top b{font:600 22px/1 var(--f-display);letter-spacing:-.03em}
+.big2 .tr{height:38px;border-radius:10px;background:color-mix(in srgb,var(--line) 55%,transparent);overflow:hidden}
+.big2 .tr i{display:block;height:100%;border-radius:10px;transform-origin:left;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.big2.pending .tr i{transform:scaleX(0)}
+
+/* findings */
+.find{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.find .card{display:grid;gap:12px;align-content:start}
+.find .no{font:600 12px/1 var(--f-mono);color:var(--faint)}
+.find h4{font-size:18px;line-height:1.3;letter-spacing:-.015em}
+.find .k{font:500 14px/1.45 var(--f-mono);color:var(--cash);background:var(--chip);padding:10px 12px;border-radius:10px}
+.find .d{font-size:14.5px;color:var(--muted);display:flex;gap:8px}
+.find .d::before{content:"→";color:var(--faint)}
+
+/* hypotheses */
+.hyp{display:grid;gap:12px}
+.hyp li{list-style:none;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;padding:16px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.hyp{margin:0;padding:0}
+.hyp b{font:600 13px/1 var(--f-mono);color:var(--cash);white-space:nowrap}
+.hcards .card{display:grid;gap:12px;align-content:start;position:relative}
+.hcards .hn{font:600 46px/1 var(--f-display);letter-spacing:-.05em;color:var(--earn)}
+.hcards .sum{font:600 14px/1.3 var(--f-mono);padding:8px 12px;border-radius:8px;background:var(--earn-soft);color:var(--earn);justify-self:start}
+.verdict{display:inline-block;font:700 12px/1 var(--f-mono);letter-spacing:.1em;padding:7px 10px;border-radius:6px;border:1.5px solid var(--neg);color:var(--neg);text-transform:uppercase}
+
+/* timeline */
+.tl{position:relative;padding:34px 0 30px}
+.tl .ax{height:2px;background:var(--line);position:relative}
+.tl .win{position:absolute;top:-9px;height:20px;border-radius:6px}
+.tl .win span{position:absolute;bottom:26px;left:0;font:600 12px/1.3 var(--f-mono);white-space:nowrap}
+.tl .tk{position:absolute;top:10px;font:500 11px/1 var(--f-mono);color:var(--faint);transform:translateX(-50%)}
+.yrs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.yrs span{font:600 15px/1 var(--f-mono);padding:12px 14px;border-radius:10px;background:var(--cash-soft);color:var(--cash)}
+.yrs span.t{background:var(--cash);color:#fff}
+.yrs i{font-style:normal;color:var(--faint)}
+
+/* comparison */
+.cmp{display:grid;gap:0}
+.cmp .hdr{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top,0px));z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:12px 0;background:var(--bg);border-bottom:1px solid var(--line)}
+.cmp .hdr div{font:600 14px/1 var(--f-display);display:flex;align-items:center;gap:10px}
+.cmp .hdr i{width:10px;height:10px;border-radius:50%}
+.cmp .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:16px}
+.cmp .row>div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,2.2vw,26px);display:grid;gap:12px;align-content:start;min-width:0}
+.cmp .row>div.s1{border-top:3px solid var(--earn)}
+.cmp .row>div.s2{border-top:3px solid var(--cash)}
+.cmp h5{margin:0;font:600 12px/1.35 var(--f-mono);letter-spacing:.08em;color:var(--muted)}
+.cmp p,.cmp li{font-size:15px;line-height:1.55}
+.cmp ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.cmp li{padding-left:16px;position:relative}
+.cmp li::before{content:"";position:absolute;left:0;top:.65em;width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.cmp li b,.cmp p b{font-weight:600}
+.cmp .concl{padding:12px 14px;border-radius:10px;background:var(--chip);font-size:15px}
+.cmp .math{font-family:"Times New Roman",Georgia,serif;font-style:italic;font-size:18px;text-align:center;padding:12px;border-radius:10px;background:var(--chip);overflow-x:auto;white-space:nowrap}
+.cmp .math sub{font-size:.7em}
+@media (max-width:760px){.cmp .hdr{display:none}.cmp .row{grid-template-columns:1fr}.cmp .row>div.s1::before{content:"Судалгаа 1 (1998)";font:600 12px var(--f-mono);color:var(--earn)}.cmp .row>div.s2::before{content:"Судалгаа 2 (2023)";font:600 12px var(--f-mono);color:var(--cash)}}
+.cmpsec{padding-top:clamp(40px,6vw,72px)}
+.cmpsec h3{font:600 clamp(20px,2.4vw,28px)/1.15 var(--f-display);letter-spacing:-.02em}
+
+/* finale */
+.finale .bul{display:grid;gap:18px;max-width:780px}
+.finale .bul p{color:var(--deep-fg);font-size:clamp(17px,1.8vw,21px);line-height:1.55;padding-left:28px;position:relative}
+.finale .bul p::before{content:"";position:absolute;left:0;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--glow);box-shadow:0 0 16px var(--glow)}
+.ask{margin-top:20px;padding:clamp(24px,4vw,44px);border-radius:24px;background:linear-gradient(135deg,rgba(77,162,255,.18),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12)}
+.ask small{font:600 12px/1 var(--f-mono);letter-spacing:.14em;color:var(--glow);text-transform:uppercase}
+.ask p{font:600 clamp(24px,3.6vw,44px)/1.15 var(--f-display);letter-spacing:-.03em;color:#fff;margin-top:14px;max-width:24ch}
+.refs{display:grid;gap:12px;font-size:15px}
+.refs li{word-break:break-word}
+.refs{margin:0;padding-left:20px}
+footer{padding-block:36px 56px;color:var(--faint);font-size:13px}
+
+/* reveal */
+.rv{transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.pre{opacity:0;transform:translateY(22px)}
+@media (prefers-reduced-motion:reduce){.rv,.rv.pre{opacity:1;transform:none;transition:none}.hb .bar,.big2 .tr i{transition:none}}
+</style>
+
+<nav class="nav" id="nav" aria-label="Бүлгүүд">
+  <div class="wrap">
+    <span class="brand">Санхүүгийн тайлагнал ба мөнгөн урсгал</span>
+    <ol id="navlist">
+      <li><a href="#ch1">1 Тайлагнал</a></li>
+      <li><a href="#ch2">2 Харьцаа</a></li>
+      <li><a href="#ch3">3 DuPont</a></li>
+      <li><a href="#ch4">4 Шийдвэр</a></li>
+      <li><a href="#ch5">5 Өгүүлэл 1</a></li>
+      <li><a href="#ch6">6 Өгүүлэл 2</a></li>
+      <li><a href="#ch7">7 Харьцуулалт</a></li>
+      <li><a href="#ch8">8 Хэлэлцүүлэг</a></li>
+    </ol>
+  </div>
+  <div class="bar" id="bar"></div>
+</nav>
+
+<!-- ============ S1 HERO ============ -->
+<header class="hero" id="top">
+  <canvas id="flow" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="kicker">ADVANCED FINANCIAL MANAGEMENT · CHAPTER 2, 3</div>
+    <h1><span>Санхүүгийн тайлагнал</span><span>ба мөнгөн урсгал</span></h1>
+    <div class="team"><b>1-р баг:</b><span>Г.Билгүүн</span><span>Д.Адъяасүрэн</span><span>М.Цэнгэлмаа</span><span>Г.Бүжинлхам</span><span>Ц.Эрдэнэтуяа</span></div>
+    <div class="scrollcue"><i></i></div>
+  </div>
+</header>
+
+<main>
+<!-- ============ S2 TOC ============ -->
+<section class="slide" id="toc">
+  <span class="sn">02 / 60</span>
+  <div class="wrap">
+    <h2 class="h2 rv">Агуулга</h2>
+    <nav class="toc" aria-label="Агуулга">
+      <a href="#ch1" class="rv"><span class="n">1</span><span class="t">Санхүүгийн тайлагнал ба мөнгөн урсгал</span>
+        <span class="s"><div>1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div><div>1.2 Үйл ажиллагааны мөнгөн урсгал, Цэвэр мөнгөн урсгал, Чөлөөт мөнгөн урсгал</div><div>1.3 Үйл ажиллагааны үр ашгийг хэмжих, зах зээлийн ба эдийн засгийн нэмэгдэл үнэ цэнэ</div></span></a>
+      <a href="#ch2" class="rv"><span class="n">2</span><span class="t">Санхүүгийн харьцааны шинжилгээ</span>
+        <span class="s"><div>2.1 Ашигт ажиллагааны харьцаа (Profitability Ratios)</div><div>2.2 Хөрөнгийн ашиглалтын харьцаа (Asset Management Ratios)</div><div>2.3 Төлбөрийн чадварын харьцаа (Liquidity Ratios)</div><div>2.4 Өрийн удирдлагын харьцаа (Debt Management Ratios)</div><div>2.5 Зах зээлийн үнэ цэнийн харьцаа (Market Value Ratios)</div></span></a>
+      <a href="#ch3" class="rv"><span class="n">3</span><span class="t">DuPont Analysis</span><span class="s"></span></a>
+      <a href="#ch4" class="rv"><span class="n">4</span><span class="t">Тайлангийн мэдээллийг үнэлгээ, удирдлагын шийдвэрт ашиглах</span><span class="s"></span></a>
+      <a href="#ch5" class="rv"><span class="n">5</span><span class="t">Өгүүлэл 1</span><span class="s"></span></a>
+      <a href="#ch6" class="rv"><span class="n">6</span><span class="t">Өгүүлэл 2</span><span class="s"></span></a>
+      <a href="#ch7" class="rv"><span class="n">7</span><span class="t">Өгүүллийн харьцуулалт</span><span class="s"></span></a>
+      <a href="#ch8" class="rv"><span class="n">8</span><span class="t">Хэлэлцүүлэг</span><span class="s"></span></a>
+    </nav>
+  </div>
+</section>
+
+<!-- ============ S3 CHAPTER 1 ============ -->
+<section class="chapter" id="ch1">
+  <span class="sn">03 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">1</div>
+    <h2 class="rv">1. Санхүүгийн тайлагнал ба мөнгөн урсгал</h2>
+    <p class="rv">Компанийн дотоод үнэ цэнэ I(ntrinsic Value) нь хөрөнгө оруулагчдын одоо болон ирээдүйд хүртэхээр хүлээгдэж буй мөнгөн урсгалын (Cash Flows) хэмжээ, бүтцээм хамаардаг.</p>
+    <p class="q rv">Компанийн мөнгөн урсгалыг нэмэгдүүлэхэд санхүүгийн менежер яаж шийдвэр гаргах вэ?</p>
+  </div>
+</section>
+
+<!-- S4 -->
+<section class="slide">
+  <span class="sn">04 / 60</span>
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+      <h2 class="h2 rv">Санхүүгийн тайлан юуг харуулдаг вэ?</h2>
+    </div>
+    <div class="grid2">
+      <div class="card rv stack">
+        <span class="tag" style="justify-self:start;background:var(--cash-soft);color:var(--cash)">Тоон мэдээлэл</span>
+        <ul class="clean">
+          <li>Хөрөнгө, өр төлбөр, эзэмшигчдийн өмчийн байдал</li>
+          <li>Тайлант хугацааны орлого, зардал, ашиг</li>
+          <li>Мөнгөн орлого, зарлагын хөдөлгөөн</li>
+        </ul>
+      </div>
+      <div class="card rv stack">
+        <span class="tag" style="justify-self:start;background:var(--earn-soft);color:var(--earn)">Чанарын мэдээлэл</span>
+        <ul class="clean earn">
+          <li>Үйл ажиллагааны үр дүн яагаад ийм гарсныг тайлбарлана</li>
+          <li>Өнгөрсөн үеийн өөрчлөлт, эрсдэл, цаашдын төлөвийг тодруулна</li>
+          <li>Тоон үзүүлэлтийг нөхцөл байдалтай нь хамт ойлгоход тусална</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S5 -->
+<section class="slide">
+  <span class="sn">05 / 60</span>
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+      <h2 class="h2 rv">Санхүүгийн тайлангийн бүрдэл</h2>
+      <p class="lede rv">Санхүүгийн тайлан бүр компанийн үйл ажиллагааг өөр өөр өнцгөөс харуулдаг. Харин санхүүгийн менежер эдгээр мэдээллийн уялдаа холбоог шинжилж, нэгдсэн дүгнэлтэд хүрэн оновчтой шийдвэр гаргадаг.</p>
+    </div>
+    <div class="grid4 quad">
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><span class="when">ТОДОРХОЙ ӨДӨРТ</span><h3>Санхүү байдлын тайлан</h3><p>Юу эзэмшиж байна? Юугаар санхүүжүүлэв?</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></div><span class="when">ТАЙЛАНТ ХУГАЦААНД</span><h3>Орлогын тайлан</h3><p>Орлогоос ашиг хэрхэн үүсэв?</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 12h16M4 6h10M4 18h7M18 15l3 3-3 3"/></svg></div><span class="when">ЭХЛЭЛЭЭС ТӨГСГӨЛ ХҮРТЭЛ</span><h3>Өмчийн өөрчлөлтийн тайлан</h3><p>Ашиг, ногдол ашиг өмчид яаж нөлөөлөв?</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg></div><span class="when">ТАЙЛАНТ ХУГАЦААНД</span><h3>Мөнгөн гүйлгээний тайлан</h3><p>Мөнгө хаанаас орж, хаашаа гарав?</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S6 scrolly linkages -->
+<section class="slide" id="linkage">
+  <span class="sn">06 / 60</span>
+  <div class="wrap">
+    <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+    <div class="scrolly">
+      <div class="stick">
+        <div class="links" id="links">
+          <svg id="linksvg" aria-hidden="true"></svg>
+          <div class="node" data-n="is"><h4>Орлогын тайлан</h4><div class="f">Борлуулалт − Зардал = Цэвэр ашиг</div></div>
+          <div class="node" data-n="sce"><h4>Өмчийн өөрчлөлтийн тайлан</h4><div class="f">Эхний өмч + Цэвэр ашиг − Ногдол ашиг = Эцсийн өмч</div></div>
+          <div class="node" data-n="cfs"><h4>Мөнгөн гүйлгээний тайлан</h4><div class="f">Үйл ажиллагаа + Хөрөнгө оруулалт + Санхүүжилт</div></div>
+          <div class="node" data-n="bs"><h4>Санхүү байдлын тайлан</h4><div class="f">Хөрөнгө = Өр төлбөр + Эздийн өмч</div></div>
+        </div>
+        <div class="linklbl" id="linklbl">
+          <span>1.  Цэвэр ашиг</span><span>2.  Цэвэр ашиг</span><span>3  Эцсийн эздийн өмчийн үлдэгдэл</span><span>4  Эцсийн мөнгөн хөрөнгийн үлдэгдэл</span>
+        </div>
+      </div>
+      <div class="stepcol">
+        <div class="step" data-step="1"><span class="i">1</span><h4>Орлогын тайлан → Өмчийн өөрчлөлтийн тайлан</h4><p>Цэвэр ашиг хуримтлагдсан ашгийг нэмэгдүүлж эздийн өмчийн өөрчлөлтөд тусгагдана</p></div>
+        <div class="step" data-step="2"><span class="i">2</span><h4>Орлогын тайлан → Мөнгөн гүйлгээний тайлан</h4><p>Шууд бус аргын үед цэвэр ашиг нь үйл ажиллагааны мөнгөн гүйлгээг тооцох эхлэл болно.</p></div>
+        <div class="step" data-step="3"><span class="i">3</span><h4>Өмчийн өөрчлөлтийн тайлан → Санхүү байдлын тайлан</h4><p>Эцсийн эздийн өмчийн үлдэгдэл нь санхүүгийн байдлын тайлангийн мөнгө, түүнтэй адилтгах хөрөнгөд тусгагдана.</p></div>
+        <div class="step" data-step="4"><span class="i">4</span><h4>Мөнгөн гүйлгээний тайлан → Санхүү байдлын тайлан</h4><p>Эцсийн мөнгөн үхөрөнгийн үлдэгдэл нь балансын мөнгөн хөрөнгөд тусгагдана</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S7 balance sheet -->
+<section class="slide">
+  <span class="sn">07 / 60</span>
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+      <h2 class="h2 rv">Санхүүгийн байдлын тайлан (Balance Sheet)</h2>
+      <div class="fx big rv" style="display:inline-block">Хөрөнгө = Өр төлбөр + Эзэмшигчдийн өмч<span class="en">Assets = Liabilities + Equity</span></div>
+    </div>
+    <div class="bs rv">
+      <div class="col assets">
+        <div class="blk a"><h4>Хөрөнгө</h4><div class="sub"><div>Эргэлтийн хөрөнгө</div><div>Эргэлтийн бус хөрөнгө</div></div></div>
+        <div class="cap">Хөрвөх чадвараар эрэмбэлнэ</div>
+      </div>
+      <div class="eq">=</div>
+      <div class="col">
+        <div class="blk l"><h4>Өр төлбөр</h4><div class="sub"><div>Богино хугацаат өр</div><div>Урт хугацаат өр</div></div></div>
+        <div class="cap">Төлөх хугацаагаар ангилна</div>
+        <div class="blk e"><h4>Эзэмшигчдийн өмч</h4><div class="sub"><div>Хувь нийлүүлсэн хөрөнгө</div><div>Хуримтлагдсан ашиг</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S8 income + equity -->
+<section class="slide">
+  <span class="sn">08 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+    <div class="grid2">
+      <div class="card rv stack">
+        <h3 class="h3">Орлогын тайлан (Income Statement)</h3>
+        <ul class="clean">
+          <li>Тодорхой хугацаанд олсон орлого, гаргасан зардлыг нэгтгэнэ</li>
+          <li>Үйл ажиллагааны ашиг (EBIT), хүү ба татварын өмнөх ашиг, цэвэр ашгийг ялгана</li>
+          <li>Нягтлан бодох бүртгэлийн хуримтлалын зарчмаар бүртгэнэ</li>
+        </ul>
+        <div class="cascade" id="cascade" aria-hidden="true">
+          <div style="background:var(--cash);width:100%">Sales</div>
+          <div style="background:color-mix(in srgb,var(--cash) 78%,var(--earn));width:62%">EBIT</div>
+          <div style="background:color-mix(in srgb,var(--cash) 45%,var(--earn));width:48%">EBT</div>
+          <div style="background:var(--earn);width:34%">Net income</div>
+        </div>
+        <div class="fx">Цэвэр ашиг = Татварын өмнөх ашиг − Татвар<span class="en">Net income = Earnings before taxes − Taxes</span></div>
+        <p class="muted small">Борлуулалтаас цэвэр ашиг хүртэлх замыг харуулна.</p>
+      </div>
+      <div class="card rv stack">
+        <h3 class="h3">Өмчийн өөрчлөлтийн тайлан (Statement of Changes in Equity)</h3>
+        <ul class="clean accr">
+          <li>Эхний ба эцсийн өмчийн үлдэгдлийн зөрүүг тайлбарлана</li>
+          <li>Ашиг, ногдол ашиг, хувьцаа гаргалт болон бусад өөрчлөлтийг харуулна</li>
+        </ul>
+        <div class="fx">Эцсийн өмч = Эхний өмч + Цэвэр ашиг − Ногдол ашиг ± Хувьцааны өөрчлөлт</div>
+        <p class="muted small">Цэвэр ашиг энэ тайлангаар дамжиж балансын өмчид тусгагдана.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S9 + S10 cash flow -->
+<section class="slide">
+  <span class="sn">09–10 / 60</span>
+  <div class="wrap gap-l">
+    <div>
+      <div class="eyebrow">1.1 Санхүүгийн тайлан, түүний уялдаа холбоо</div>
+      <h2 class="h2 rv">Мөнгөн гүйлгээний тайлан (Cash Flow Statement)</h2>
+      <div class="stack narrow">
+        <p class="lede rv"><strong>Мөнгөн гүйлгээний тайлан нь компани ашигтай ажиллаж байгаа эсэхээс гадна бодитоор хэр хэмжээний мөнгөн хөрөнгө бий болгож, түүнийгээ юунд зарцуулж байгааг харуулдаг.</strong></p>
+        <p class="lede rv">Тодорхой хугацаанд компанид орсон болон гарсан мөнгөн хөрөнгийн хөдөлгөөнийг харуулдаг санхүүгийн тайлан юм. Энэ нь мөнгөн гүйлгээг үйл ажиллагааны, хөрөнгө оруулалтын, санхүүжилтийн гэсэн үндсэн гурван хэсэгт ангилж, компанийн мөнгө бий болгох чадвар, төлбөрийн чадвар, санхүүгийн уян хатан байдлыг үнэлэхэд тусалдаг.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="eyebrow">1.2 Цэвэр мөнгөн урсгал</div>
+      <div class="grid3 cf3">
+        <div class="card rv"><span class="ix">1. (Operating cash flow)</span><h3>Үйл ажиллагааны мөнгөн урсгал <span class="ab">OCF</span></h3>
+          <div class="fx" style="font-size:13px">OCF= Net Income + Noncash Expenses ± Adjustments</div>
+          <div class="io"><div class="in"><b>+</b><span>Борлуулалтын орлого, харилцагчаас авсан мөнгө</span></div><div class="out"><b>−</b><span>Нийлүүлэгч, ажилтанд төлсөн мөнгө, татвар</span></div></div></div>
+        <div class="card rv"><span class="ix">2. (Investing cash flow)</span><h3>Хөрөнгө оруулалтын мөнгөн урсгал <span class="ab">ICF</span></h3>
+          <div class="io"><div class="in"><b>+</b><span>Үндсэн хөрөнгө, хөрөнгө оруулалт борлуулсан мөнгө</span></div><div class="out"><b>−</b><span>Үндсэн хөрөнгө, хөрөнгө оруулалт худалдан авсан мөнгө</span></div></div></div>
+        <div class="card rv"><span class="ix">3. (Financing cash flow)</span><h3>Санхүүжилтын мөнгөн урсгал <span class="ab">FCF</span></h3>
+          <div class="io"><div class="in"><b>+</b><span>Зээл, бонд, хувьцаа гаргаж татсан мөнгө</span></div><div class="out"><b>−</b><span>Зээлийн үндсэн төлбөр, ногдол ашиг, хувьцаа буцаан худалдан авалт</span></div></div></div>
+      </div>
+      <div class="merge" aria-hidden="true"><svg viewBox="0 0 1000 90" preserveAspectRatio="none" id="mergesvg"></svg></div>
+      <div class="fx big rv" style="text-align:center;background:var(--cash);color:#fff">Цэвэр мөнгөн урсгал = Үйл ажиллагааны мөнгөн урсгал + Хөрөнгө оруулалтын мөнгөн урсгал + Санхүүжилтын мөнгөн урсгал<span class="en" style="color:rgba(255,255,255,.75)">Net cash flow= Operating CF + Investing CF + Financing CF</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- S11 -->
+<section class="slide">
+  <span class="sn">11 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">1.2 Цэвэр мөнгөн урсгал</div>
+    <h2 class="h2 rv">Цэвэр ашиг ба цэвэр мөнгөн урсгалын ялгаа</h2></div>
+    <div class="vs">
+      <div class="card c-earn rv"><h3>Цэвэр ашиг (Net income)</h3><ul class="clean earn">
+        <li>Орлогын тайлангийн эцсийн үр дүн</li>
+        <li>Аккруэл бүртгэлийн суурьтай: орлого, зардлыг үүссэн үед нь бүртгэнэ. (Мөнгөөр орж ирээгүй авлага, мөнгөөр төлөөгүй зардал)</li>
+        <li>Элэгдэл, хорогдлыг зардалд тооцдог ч мөнгөөр гарахгүй</li></ul></div>
+      <div class="mid">vs</div>
+      <div class="card c-cash rv"><h3>Цэвэр мөнгөн урсгал (Net cash flow)</h3><ul class="clean">
+        <li>Мөнгөн бус орлого, зардлын нөлөөг засварлан тооцно</li>
+        <li>Элэгдэл, хорогдлыг цэвэр ашигт буцаан нэмж тооцно</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- S12 FCF -->
+<section class="slide">
+  <span class="sn">12 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">1.3 Чөлөөт мөнгөн урсгал (Free Cash Flow, FCF)</div>
+    <p class="h2 rv" style="max-width:24ch">Үйл ажиллагааг хэвийн үргэлжлүүлэхэд шаардлагатай хөрөнгө оруулалтын дараа хөрөнгө оруулагчдад үлдэх мөнгөн урсгал.</p>
+    <div class="fx big rv">FCF = NOPAT − Үйл ажиллагааны капиталын цэвэр хөрөнгө оруулалт<span class="en">FCF = NOPAT − Net investment in total operating capital</span></div></div>
+    <div class="grid3">
+      <div class="card rv stack"><h3 class="h3">FCF юунд ашиглагдах вэ?</h3><ol class="steps">
+        <li>Хүү болон өрийн үндсэн төлбөр төлөх</li><li>Ногдол ашиг олгох, хувьцаа буцаан худалдан авах</li><li>Үйл ажиллагааны бус хөрөнгөд хөрөнгө оруулах</li></ol></div>
+      <div class="card rv stack"><h3 class="h3">NOPAT гэж юу вэ?</h3><div class="fx big">NOPAT = EBIT × (1 − T)<span class="en">(T = татварын хувь)</span></div><p class="muted">Татварын дараах үйл ажиллагааны ашиг</p></div>
+      <div class="card rv stack"><h3 class="h3">Яагаад EBIT-ээр?</h3><p class="muted">Үндсэн үйл ажиллагаа хэр ашигтайг санхүүжилтын эх үүсвэрээс үл хамааран хэмжинэ. Гүйцэтгэлийг харьцуулахад цэвэр ашгаас илүү тохиромжтой.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S13 -->
+<section class="slide">
+  <span class="sn">13 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">1.3 Чөлөөт мөнгөн урсгал (Free Cash Flow, FCF)</div>
+    <p class="lede rv"><strong>Үйл ажиллагааны капиталын цэвэр хөрөнгө оруулалт:</strong> Үндсэн үйл ажиллагааг явуулахад капитал хэр хэмжээгээр шаардагдаж байгааг тодорхойлно.</p></div>
+    <div class="chain">
+      <div class="card rv"><span class="no">1</span><span class="ttl">NET OPERATING WORKING CAPITAL</span><div class="fx">NOWC = Үйл ажиллагааны эргэлтийн хөрөнгө − Үйл ажиллагааны богино хугацаат өр төлбөр</div><span class="en">Operating current assets − Operating current liabilities</span><p class="muted small">Өдөр тутмын үйл ажиллагаанд шаардагдах цэвэр эргэлтийн хөрөнгө</p></div>
+      <div class="card rv"><span class="no">2</span><span class="ttl">TOTAL NET OPERATING CAPITAL</span><div class="fx">Нийт цэвэр үйл ажиллагааны капитал = NOWC + Үйл ажиллагааны урт хугацаат хөрөнгө</div><span class="en">NOWC + Operating long-term assets</span><p class="muted small">Үндсэн үйл ажиллагаанд ашиглагдаж буй нийт капитал</p></div>
+      <div class="card rv"><span class="no">3</span><span class="ttl">NET INVESTMENT IN OPERATING CAPITAL</span><div class="fx">Капиталын цэвэр хөрөнгө оруулалт = Нийт цэвэр үйл ажиллагааны капитал (тайлант үе)<br>− Нийт цэвэр үйл ажиллагааны капитал (өмнөх үе)</div><span class="en">Total net operating capital (current) − Total net operating capital (previous)</span>
+        <div class="sign"><div class="p"><b>Эерэг (+)</b><span>капитал нэмж оруулсан → FCF буурна</span></div><div class="m"><b>Сөрөг (−)</b><span>капитал чөлөөлөгдсөн → FCF нэмэгдэнэ</span></div></div></div>
+    </div>
+    <div class="pipe rv" aria-label="NOWC  →  Нийт үйл ажиллагааны капитал  →  Цэвэр хөрөнгө оруулалт  →  FCF"><span>NOWC</span><i>→</i><span>Нийт үйл ажиллагааны капитал</span><i>→</i><span>Цэвэр хөрөнгө оруулалт</span><i>→</i><span>FCF</span></div>
+  </div>
+</section>
+
+<!-- S14 -->
+<section class="slide">
+  <span class="sn">14 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">1.4 Үйл ажиллагааны үр ашгийг хэмжих</div></div>
+    <div class="grid3">
+      <div class="card metric rv"><span class="ab">ROIC</span><div><div class="nm">Оруулсан капиталын өгөөж</div><div class="en">(Return on invested capital)</div></div>
+        <div class="formula"><span class="frac"><span>NOPAT</span><span>Нийт цэвэр үйл ажиллагааны капитал</span></span></div>
+        <p>Үйл ажиллагааны капиталын нэг төгрөгөөс бий болсон татварын дараах ашгийг хэмжинэ</p></div>
+      <div class="card metric rv"><span class="ab">OP</span><div><div class="nm">Үйл ажиллагааны ашигт ажиллагаа</div><div class="en">(Operating profitability ratio)</div></div>
+        <div class="formula"><span class="frac"><span>NOPAT</span><span>Борлуулалт</span></span></div>
+        <p>Борлуулалтын нэг төгрөг тутамд хэдий хэмжээний NOPAT бий болгож байгааг хэмжинэ</p></div>
+      <div class="card metric rv"><span class="ab">CR</span><div><div class="nm">Капиталын хэрэгцээний харьцаа</div><div class="en">(Capital requirement ratio)</div></div>
+        <div class="formula"><span class="frac"><span>Нийт цэвэр үйл ажиллагааны капитал</span><span>Борлуулалт</span></span></div>
+        <p>Борлуулалтын нэг төгрөгийг бий болгоход хэдий хэмжээний үйл ажиллагааны капитал шаардагдахыг харуулна</p></div>
+    </div>
+    <div class="callout rv"><b class="lbl">WACC</b><h3 class="h3" style="margin-bottom:12px">Капиталын жигнэсэн дундаж өртөг (Weighted Average Cost of Capital)</h3>
+      <div class="stack"><p>Хөрөнгө оруулагчдын (зээлдүүлэгч, хувьцаа эзэмшигч) компаниас шаардах хамгийн бага өгөөж буюу капиталын өртөг.</p>
+      <div class="fx">WACC = Өрийн жин × Өрийн хүү × (1 − T) + Өмчийн жин × Өмчийн өртөг</div>
+      <p class="muted">ROIC-ийг WACC-тай харьцуулж, бий болгосон өгөөж капиталын өртгөө давж байгаа эсэхийг үнэлнэ.</p></div></div>
+  </div>
+</section>
+
+<!-- S15 MVA EVA -->
+<section class="slide">
+  <span class="sn">15 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">1.5 Зах зээлийн ба эдийн засгийн нэмэгдэл үнэ цэнэ</div>
+    <h2 class="h2 rv" style="max-width:22ch">Компанийн үнэ цэнэ нь ирээдүйд бий болгох чөлөөт мөнгөн урсгалын өнөөгийн үнэ цэнээс хамаарна.</h2></div>
+    <div class="grid2">
+      <div class="card rv stack"><div class="span">БАЙГУУЛАГДСАНААС ХОЙШХИ ҮР ДҮН</div><h3 class="h3">MVA</h3>
+        <p class="muted">(Market Value Added) гэдэг нь компанийн зах зээлийн үнэ цэнэ оруулсан нийт хөрөнгөөс хэр ихээр давж байгааг хэмждэг</p>
+        <div class="eqrow"><span class="lhs">MVA</span><span class="op">=</span><span class="t"><b>Хувьцааны тоо × Хувьцааны үнэ</b><small>Зах зээлийн үнэ цэнэ</small></span><span class="op">−</span><span class="t"><b>Нийт энгийн өмч (Total common equity)</b><small>Оруулсан өмч</small></span></div>
+        <p class="small muted">Эсвэл: Компанийн зах зээлийн үнэ цэнэ − Хөрөнгө оруулагчдын оруулсан капитал</p>
+        <div class="sign"><div class="m"><b>MVA &gt; 0</b><span>Зах зээлийн үнэ цэн оруулсан хөрөнгөөс өндөр.</span></div><div class="p"><b>MVA &lt; 0</b><span>Зах зээлийн үнэ цэн оруулсан хөрөнгөөс бага.</span></div></div>
+      </div>
+      <div class="card rv stack"><div class="span">НЭГ ЖИЛИЙН ГҮЙЦЭТГЭЛ</div><h3 class="h3">EVA</h3>
+        <p class="muted">(Economic Value Added) гэдэг нь компани хөрөнгө оруулагчдын шаарддаг өгөөжөөс давсан нэмэлт үнэ цэн бүтээж байгаа эсэхийг хэмждэг үзүүлэлт.</p>
+        <div class="eqrow"><span class="lhs">EVA</span><span class="op">=</span><span class="t"><b>NOPAT</b><small>Үйл ажиллагааны татварын дараах ашиг</small></span><span class="op">−</span><span class="t"><b>WACC × Капитал</b><small>Капиталын мөнгөн өртөг</small></span></div>
+        <div class="fx">EVA = Капитал × (ROIC − WACC)<span class="en">Капитал = Нийт цэвэр үйл ажиллагааны капитал</span></div>
+        <p class="small muted">EVA &gt; 0: Үнэ цэн бүтээсэн. EVA &lt; 0: Хөрөнгийн өртгөө нөхөөгүй.</p>
+      </div>
+    </div>
+    <div class="card rv calc" id="eva">
+      <div class="stack">
+        <span class="tag" style="justify-self:start">Жишээ тооцоо · EVA = Капитал × (ROIC − WACC)</span>
+        <div class="sl"><label for="evaK">Капитал <output id="evaKo"></output></label><input type="range" id="evaK" min="100" max="2000" step="50" value="1000"></div>
+        <div class="sl"><label for="evaR">ROIC <output id="evaRo"></output></label><input type="range" id="evaR" min="0" max="30" step="0.5" value="13"></div>
+        <div class="sl"><label for="evaW">WACC <output id="evaWo"></output></label><input type="range" id="evaW" min="0" max="20" step="0.5" value="9"></div>
+      </div>
+      <div class="readout"><span class="lbl">EVA</span><span class="big" id="evaOut">40</span><span class="state good" id="evaState"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 2 ============ -->
+<section class="chapter" id="ch2">
+  <span class="sn">16 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">2</div>
+    <h2 class="rv">2. Санхүүгийн харьцааны шинжилгээ ба DUPONT задаргаа.</h2>
+  </div>
+</section>
+<section class="slide">
+  <span class="sn">16 / 60</span>
+  <div class="wrap gap-l">
+    <div class="stack">
+      <div class="eyebrow">ХАРЬЦАА ҮЗҮҮЛЭЛТҮҮД</div>
+      <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))">
+        <a class="card cat rv" href="#r21" style="text-decoration:none;color:inherit"><span class="tag">Санхүүгийн харьцаа</span><h3 class="h3" style="font-size:20px">Ашигт ажиллагаа</h3><p class="q muted">Борлуулалт, хөрөнгө, өмчөөс хэр ашиг олж байна вэ?</p><div class="chips"><span class="chip">Net profit margin, ROA, ROE</span></div></a>
+        <a class="card cat rv" href="#r22" style="text-decoration:none;color:inherit"><span class="tag">Санхүүгийн харьцаа</span><h3 class="h3" style="font-size:20px">Хөрөнгийн удирдлага</h3><p class="q muted">Хөрөнгийг хэр үр ашигтай ашиглаж байна вэ?</p><div class="chips"><span class="chip">Inventory turnover, DSO, Total assets turnover</span></div></a>
+        <a class="card cat rv" href="#r23" style="text-decoration:none;color:inherit"><span class="tag">Санхүүгийн харьцаа</span><h3 class="h3" style="font-size:20px">Төлбөрийн чадвар</h3><p class="q muted">Богино хугацаат өрөө төлж чадах уу?</p><div class="chips"><span class="chip">Current ratio, Quick ratio</span></div></a>
+        <a class="card cat rv" href="#r24" style="text-decoration:none;color:inherit"><span class="tag">Санхүүгийн харьцаа</span><h3 class="h3" style="font-size:20px">Өрийн удирдлага</h3><p class="q muted">Өрийн хэмжээ ба төлбөрийн дарамт ямар байна вэ?</p><div class="chips"><span class="chip">Debt-to-assets, TIE, Equity multiplier</span></div></a>
+        <a class="card cat rv" href="#r25" style="text-decoration:none;color:inherit"><span class="tag">Санхүүгийн харьцаа</span><h3 class="h3" style="font-size:20px">Зах зээлийн үнэлгээ</h3><p class="q muted">Хөрөнгө оруулагчид компанийг хэрхэн үнэлж байна вэ?</p><div class="chips"><span class="chip">P/E, P/FCF, Market/Book</span></div></a>
+      </div>
+      <p class="note">Гол асуулт · Жишээ үзүүлэлт</p>
+    </div>
+    <div class="stack">
+      <div class="eyebrow">DUPONT ЗАДАРГАА</div>
+      <div class="tblwrap rv"><table class="t min">
+        <thead><tr><th>Шинжилгээний нөхцөл</th><th>DuPont-оор шалгах зүйл</th><th>Гаргах шийдвэр</th></tr></thead>
+        <tbody>
+          <tr><td>ROE буурсан</td><td>Ашигт ажиллагаа, хөрөнгийн эргэлт, хөшүүргийн аль нь буурсныг тогтоох</td><td>Зардал бууруулах, борлуулалт нэмэгдүүлэх, хөрөнгийн ашиглалтыг сайжруулах</td></tr>
+          <tr><td>ROE салбарын дунджаас доогуур</td><td>Гурван хүчин зүйлийг салбарын үзүүлэлттэй харьцуулах</td><td>Сул байгаа үзүүлэлтэд чиглэсэн арга хэмжээ авах</td></tr>
+          <tr><td>Өр нэмэгдсэн</td><td>Equity Multiplier өссөн эсэх, ROE-д хэрхэн нөлөөлснийг шалгах</td><td>Шинэ зээл авах, өрийн бүтцийг өөрчлөх шийдвэрийг үнэлэх</td></tr>
+          <tr><td>Хөрөнгө оруулалт нэмэгдсэн</td><td>Total Assets Turnover буурсан эсэхийг шалгах</td><td>Шинэ хөрөнгө борлуулалт, ашигт ажиллагаанд үр дүн өгч байгаа эсэхийг үнэлэх</td></tr>
+          <tr><td>ROE өссөн</td><td>Өсөлт ашигт ажиллагаанаас уу, хөрөнгийн үр ашгаас уу, эсвэл өрийн хөшүүргээс үү гэдгийг тогтоох</td><td>Өсөлтийн чанар, санхүүгийн эрсдэлийг хамтад нь үнэлэх</td></tr>
+        </tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ratio slides 17-21 are rendered from data (text verbatim) -->
+<div id="ratios"></div>
+
+<!-- ============ CHAPTER 3 DuPont ============ -->
+<section class="chapter" id="ch3">
+  <span class="sn">22 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">3</div>
+    <h2 class="rv">3. DuPont задаргаа (DuPont Analysis)</h2>
+    <p class="rv">DuPont задаргаа нь компанийн өөрийн хөрөнгийн өгөөж (ROE) ямар хүчин зүйлсээс шалтгаалан бий болж байгааг задлан шинжлэх арга юм. ROE нь зөвхөн ашигт ажиллагаанаас бус, хөрөнгийн ашиглалтын үр ашиг болон санхүүгийн хөшүүргээс мөн хамаардаг.</p>
+  </div>
+</section>
+<section class="slide">
+  <span class="sn">22 / 60</span>
+  <div class="wrap gap-l">
+    <div class="stack">
+      <div class="dp">
+        <div class="f rv"><b>1. Profit Margin</b><span class="fml">Цэвэр ашиг / Борлуулалт</span><p>Борлуулалтаас хэр хэмжээний ашиг олж байна вэ?</p></div>
+        <div class="x">×</div>
+        <div class="f rv"><b>2. Total Assets Turnover</b><span class="fml">Борлуулалт / Нийт хөрөнгө</span><p>Хөрөнгөө хэр үр ашигтай ашиглаж байна вэ?</p></div>
+        <div class="x">×</div>
+        <div class="f rv"><b>3. Equity Multiplier</b><span class="fml">Нийт хөрөнгө / Эздийн өмч</span><p>Өөрийн хөрөнгөтэй харьцуулахад хэдий хэмжээний хөрөнгө ашиглаж байна вэ?</p></div>
+      </div>
+      <div class="roe"><span class="down">↓</span><span class="pill">ROE</span><span class="muted">Эздийн өмчийн өгөөж</span></div>
+    </div>
+    <div class="stack">
+      <div class="fx big rv">ROE = Profit Margin × Total Assets Turnover × Equity Multiplier</div>
+      <span class="tag" style="justify-self:start">OR</span>
+      <div class="cancel rv" id="cancel3">
+        <span class="lhs">ROE =</span>
+        <span class="frac"><span>Net Income</span><span><s>Sales</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>Sales</s></span><span><s>Total Assets</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>Total Assets</s></span><span>Common Equity</span></span>
+        <span class="res"><span class="op">=</span><span class="frac"><span>Net Income</span><span>Common Equity</span></span></span>
+        <button class="replay" type="button" data-replay="cancel3">↻</button>
+      </div>
+    </div>
+    <div class="card rv calc" id="dupont">
+      <div class="stack">
+        <span class="tag" style="justify-self:start">Жишээ тооцоо · ROE = Profit Margin × Total Assets Turnover × Equity Multiplier</span>
+        <div class="sl"><label for="dpPM">1. Profit Margin <output id="dpPMo"></output></label><input type="range" id="dpPM" min="0" max="25" step="0.5" value="8"></div>
+        <div class="sl"><label for="dpTA">2. Total Assets Turnover <output id="dpTAo"></output></label><input type="range" id="dpTA" min="0.2" max="3" step="0.05" value="1.25"></div>
+        <div class="sl"><label for="dpEM">3. Equity Multiplier <output id="dpEMo"></output></label><input type="range" id="dpEM" min="1" max="5" step="0.1" value="2"></div>
+      </div>
+      <div class="readout"><span class="lbl">ROE</span><span class="big" id="dpOut" style="color:var(--cash)">20.0%</span>
+        <div class="factorbar" aria-hidden="true"><i id="fb1" style="background:var(--cash)"></i><i id="fb2" style="background:var(--accr)"></i><i id="fb3" style="background:var(--earn)"></i></div>
+        <div class="legend" style="margin:0"><span class="key"><i style="background:var(--cash)"></i>Profit Margin</span><span class="key"><i style="background:var(--accr)"></i>Total Assets Turnover</span><span class="key"><i style="background:var(--earn)"></i>Equity Multiplier</span></div>
+      </div>
+    </div>
+    <div class="tblwrap rv"><table class="t min">
+      <thead><tr><th>Хүчин зүйл</th><th>Өндөр байх нь</th><th>Бага байх нь</th></tr></thead>
+      <tbody>
+        <tr><td>Profit Margin</td><td>Борлуулалтаас өндөр ашиг олж байна. Зардлын хяналт, үнэ тогтоолт үр ашигтай байж болно.</td><td>Зардал өндөр, ашигт ажиллагаа сул байж болзошгүй.</td></tr>
+        <tr><td>Total Assets Turnover</td><td>Хөрөнгө бүрээс илүү их борлуулалт бий болгож байна.</td><td>Хөрөнгө ашиглалт сул, илүүдэл хөрөнгө эсвэл борлуулалт хангалтгүй байж болно.</td></tr>
+        <tr><td>Equity Multiplier</td><td>Өр болон бусад эх үүсвэрийн оролцоо өндөр, санхүүгийн хөшүүрэг их байна.</td><td>Өөрийн хөрөнгөөр санхүүжүүлсэн хувь харьцангуй өндөр байна.</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- S23 extended -->
+<section class="slide">
+  <span class="sn">23 / 60</span>
+  <div class="wrap gap-l">
+    <div><h2 class="h2 rv">3. DuPont-ийн 5 хүчин зүйлтэй задлан шинжилгээ (Extended DuPont Analysis)</h2>
+    <p class="lede rv">Өргөтгөсөн DuPont загвар нь ROE-г татвар, хүүгийн зардал, үйл ажиллагааны ашигт ажиллагаа, хөрөнгийн ашиглалт болон санхүүгийн хөшүүргийн нөлөөгөөр задалж тайлбарладаг.</p></div>
+    <div class="stack">
+      <div class="dp five">
+        <div class="f rv"><b>1. Tax Burden</b><p>Татварын ачаалал</p><span class="fml">Татварын дараах ашиг / Татварын өмнөх ашиг</span></div><div class="x">×</div>
+        <div class="f rv"><b>2. Interest Burden</b><p>Хүүгийн зардлын нөлөө</p><span class="fml">Татварын өмнөх ашиг / Хүү, татварын өмнөх ашиг</span></div><div class="x">×</div>
+        <div class="f rv"><b>3. Operating Profit Margin</b><p>Үйл ажиллагааны ашгийн маржин</p><span class="fml">Үйл ажиллагааны ашиг / Борлуулалт</span></div><div class="x">×</div>
+        <div class="f rv"><b>4. Total Assets Turnover</b><p>Нийт хөрөнгийн эргэц</p><span class="fml">Борлуулалт / Дундаж нийт хөрөнгө</span></div><div class="x">×</div>
+        <div class="f rv"><b>5. Equity Multiplier</b><p>Өөрийн хөрөнгийн үржүүлэгч</p><span class="fml">Дундаж нийт хөрөнгө / Дундаж эздийн өмч</span></div>
+      </div>
+      <div class="roe"><span class="down">↓</span><span class="pill">ROE</span><span class="muted">Эздийн өмчийн өгөөж</span></div>
+    </div>
+    <div class="stack">
+      <div class="fx big rv">ROE = Tax Burden × Interest Burden × Operating Profit Margin<br>× Total Assets Turnover × Equity Multiplier</div>
+      <span class="tag" style="justify-self:start">OR</span>
+      <div class="cancel rv" id="cancel5">
+        <span class="frac"><span>Net Income</span><span><s>EBT</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>EBT</s></span><span><s>EBIT</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>EBIT</s></span><span><s>Sales</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>Sales</s></span><span><s>Average Total Assets</s></span></span><span class="op">×</span>
+        <span class="frac"><span><s>Average Total Assets</s></span><span>Average Common Equity</span></span>
+        <span class="res"><span class="op">=</span><span class="frac"><span>Net Income</span><span>Average Common Equity</span></span></span>
+        <button class="replay" type="button" data-replay="cancel5">↻</button>
+      </div>
+    </div>
+    <div class="tblwrap rv"><table class="t min">
+      <thead><tr><th>Хүчин зүйл</th><th>Өндөр байх нь</th><th>Бага байх нь</th></tr></thead>
+      <tbody>
+        <tr><td>Tax Burden</td><td>Татварын дараах ашгийн хувь өндөр; татварын дарамт харьцангуй бага.</td><td>Татварын зардал өндөр тул цэвэр ашиг буурч байна.</td></tr>
+        <tr><td>Interest Burden</td><td>Хүүгийн зардлын дарамт бага; EBIT-ээс EBT-д шилжих хувь өндөр.</td><td>Зээлийн хүүгийн зардал их, санхүүжилтийн өртөг өндөр.</td></tr>
+        <tr><td>Operating Profit Margin</td><td>Борлуулалтын нэгж тутмаас илүү үйл ажиллагааны ашиг олж байна.</td><td>Үйл ажиллагааны зардал өндөр эсвэл үнэ тогтоолт сул.</td></tr>
+        <tr><td>Total Assets Turnover</td><td>Хөрөнгийг үр ашигтай ашиглаж, хөрөнгө тутмаас их борлуулалт бий болгож байна.</td><td>Хөрөнгийн ашиглалт сул эсвэл илүүдэл хөрөнгөтэй.</td></tr>
+        <tr><td>Equity Multiplier</td><td>Өрийн санхүүжилтийн оролцоо, санхүүгийн хөшүүрэг өндөр.</td><td>Өрийн хөшүүрэг бага; өөрийн хөрөнгөөр санхүүжсэн хувь өндөр.</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 4 ============ -->
+<section class="chapter" id="ch4">
+  <span class="sn">24 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">4</div>
+    <h2 class="rv">4. Тайлангийн мэдээллийг үнэлгээ, удирдлагын шийдвэрт ашиглах</h2>
+  </div>
+</section>
+<section class="slide">
+  <span class="sn">24 / 60</span>
+  <div class="wrap">
+    <div class="dec rv" id="dec">
+      <div class="hd"><div>Илэрсэн нөхцөл</div><div>Шинжлэх үзүүлэлт</div><div>Боломжит шийдвэр</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 5 Article 1 ============ -->
+<section class="chapter" id="ch5">
+  <span class="sn">25 / 60</span>
+  <div class="wrap">
+    <div class="kicker rv">5. Өгүүлэл 1</div>
+    <div class="paper">
+      <h2 class="ptitle rv">The relation between earnings and cash flows</h2>
+      <div class="meta rv">
+        <div><small>Нийтлэгдсэн огноо</small><span class="yr">1998</span></div>
+        <div><small>Сэтгүүл</small><span>Journal of Accounting Economics</span></div>
+        <div><small>Судлаачид</small><span>Patricia M. Dechow, S.P. Kothari, Ross L. Watts</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide">
+  <span class="sn">25 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <div class="grid2" style="align-items:start">
+      <h2 class="h2 rv">Судалгааны үндэслэл</h2>
+      <div class="stack">
+        <p class="rv">Цэвэр ашиг нь компанийн санхүүгийн гүйцэтгэлийг илэрхийлэх үндсэн үзүүлэлт бөгөөд хувьцааны үнэлгээ, удирдлагын гүйцэтгэл болон компанийн үнэ цэнийг тодорхойлоход өргөн ашиглагддаг.</p>
+        <p class="rv">Аккруэл бүртгэлийн зарчмын дагуу ирээдүйд бий болох мөнгөн орлого, зарлагын мэдээллийг цэвэр ашигт тусгадаг тул цэвэр ашиг нь тухайн үеийн мөнгөн урсгалаас илүү ирээдүйн мөнгөн урсгалыг таамаглах боломжтой гэж үздэг.</p>
+        <p class="rv">Мөн аккруэл тохируулга нь мөнгөн орлого, зарлагын хугацааны зөрүүг нөхөж, мөнгөн урсгалын хэлбэлзлийг бууруулдаг. Гэвч авлага, өглөг, бараа материалын өөрчлөлт болон үйл ажиллагааны мөнгөн мөчлөг нь энэхүү таамаглах чадварт хэрхэн нөлөөлдөг нь судлах шаардлагатай асуудал юм.</p>
+        <div class="callout rv"><p>Иймээс уг судалгаагаар цэвэр ашиг, үйл ажиллагааны мөнгөн урсгал болон аккруэл үзүүлэлтүүдийн хамаарал, тэдгээрийн ирээдүйн мөнгөн урсгалыг таамаглах чадварыг тодорхойлохыг зорьсон.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S26 -->
+<section class="slide">
+  <span class="sn">26 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h2 class="h2 rv">Судалгааны зорилго</h2>
+        <p class="rv">Энэхүү судалгааны зорилго нь цэвэр ашиг болон үйл ажиллагааны мөнгөн урсгалын хамаарлыг онолын загвар, эмпирик шинжилгээгээр тодорхойлж, ирээдүйн мөнгөн урсгалыг таамаглах чадварыг харьцуулахад оршино. Үүний хүрээнд:</p>
+        <ol class="steps rv"><li>Цэвэр ашиг, мөнгөн урсгал болон аккруэл үзүүлэлтүүдийн хамаарлыг загварчлах.</li><li>Үйл ажиллагааны мөнгөн мөчлөг цэвэр ашгийн таамаглах чадварт хэрхэн нөлөөлөхийг тодорхойлох.</li><li>Онолын загварын үр дүнг бодит өгөгдөлд үндэслэн регресс болон корреляцын шинжилгээгээр шалгах.</li></ol>
+      </div>
+      <div class="stack"><h2 class="h2 rv">Судалгааны өгөгдөл</h2>
+        <div class="tiles rv"><div class="tile cash"><b>1,337</b><span>компани</span></div><div class="tile cash"><b>22,776</b><span>ажиглалт</span></div><div class="tile"><b>1963–1992</b><span>Compustat Annual Industrial болон Annual Research</span></div></div>
+        <p class="rv">Судалгаанд Compustat Annual Industrial болон Annual Research мэдээллийн сангаас авсан 1963–1992 оны 1,337 компанийн жилийн санхүүгийн мэдээлэл, нийт 22,776 ажиглалтыг ашигласан. Компани бүрийн цэвэр ашиг, аккруэл, үйл ажиллагааны мөнгөн урсгал болон борлуулалтын үзүүлэлтээр дор хаяж 10 жилийн мэдээлэлтэй байх шаардлага тавьсан.</p>
+        <p class="rv">Үндсэн хувьсагчдад нэгж хувьцаанд ногдох цэвэр ашиг (Earnings), үйл ажиллагааны мөнгөн урсгал (CFO), аккруэл (Accruals) болон борлуулалтын орлого (Sales) багтсан.</p>
+        <p class="rv">Улирлын хэлбэлзлээс үүсэх хэмжилтийн алдааг бууруулахын тулд жилийн мэдээлэл ашиглаж, хэт их хэлбэлзэлтэй хамгийн өндөр болон бага 1%-ийн ажиглалтыг хассан. Мөн хувьцааны хуваалт, капиталын өөрчлөлтөд тохируулга хийсэн.</p>
+        <p class="rv muted">Судалгааны түүвэрт урт хугацааны мэдээлэлтэй, үйл ажиллагаагаа үргэлжлүүлсэн компаниуд давамгайлсан тул үр дүнг ерөнхийлөхдөө амьд үлдсэн компанийн сонголтын гажуудлыг (Survivorship Bias) харгалзах шаардлагатай.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S27 -->
+<section class="slide">
+  <span class="sn">27 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Судалгааны арга зүй</h2>
+    <p class="lede rv">Судлаачид онолын загварчлал болон эмпирик тоон шинжилгээг хослуулан дараах үе шаттайгаар судалгаа хийсэн.</p></div>
+    <div class="grid2">
+      <div class="card rv stack"><span class="tag" style="justify-self:start">1</span><h3 class="h3">Онолын загварчлал</h3><p class="muted">Борлуулалтын орлого санамсаргүй алхалтын процессоор өөрчлөгдөх, зардал нь хувьсах болон тогтмол зардлаас бүрдэх нөхцөлд цэвэр ашиг, үйл ажиллагааны мөнгөн урсгал болон аккруэл үзүүлэлтүүдийн хамаарлыг загварчилсан. Мөн авлага, өглөг, бараа материалын өөрчлөлтийг харгалзан үзсэн.</p></div>
+      <div class="card rv stack"><span class="tag" style="justify-self:start">2</span><h3 class="h3">Таамаглах чадварын харьцуулалт</h3><p class="muted">Ирээдүйн үйл ажиллагааны мөнгөн урсгалыг тухайн үеийн цэвэр ашиг болон мөнгөн урсгалаар тус тус таамаглаж, 1, 2, 3 жилийн хугацаанд таамаглалын алдааны стандарт хазайлтаар харьцуулсан.</p></div>
+      <div class="card rv stack"><span class="tag" style="justify-self:start">3</span><h3 class="h3">Регрессийн шинжилгээ</h3><p class="muted">Ирээдүйн мөнгөн урсгал болон тухайн үеийн цэвэр ашиг, мөнгөн урсгалын хамаарлыг дараах загвараар шинжилсэн.</p>
+        <div class="fx" style="font-family:'Times New Roman',Georgia,serif;font-style:italic;font-size:18px;text-align:center">OCF<sub>(i,t+q)</sub> = c<sub>(i,0)</sub> + c<sub>(i,1)</sub>CF<sub>(i,t)</sub> + c<sub>(i,2)</sub>E<sub>(i,t)</sub> + Error<sub>(i,t+q)</sub></div>
+        <p class="muted">Регрессийг компани тус бүрээр тооцож, коэффициентүүдийн дундаж болон статистикийн ач холбогдлыг харьцуулсан. Энэ нь панел регресс бус, компанийн түвшний хугацааны цувааны шинжилгээ юм.</p></div>
+      <div class="card rv stack"><span class="tag" style="justify-self:start">4</span><h3 class="h3">Корреляцын шинжилгээ</h3><p class="muted">Цэвэр ашиг, мөнгөн урсгал, аккруэл үзүүлэлтүүдийн өөрийн болон харилцан хугацааны корреляцыг тооцож, онолын загварын таамаглалыг бодит үр дүнтэй харьцуулсан. Мөн компаниудыг үйл ажиллагааны мөнгөн мөчлөгөөр дөрвөн бүлэгт ангилан шинжилсэн.</p></div>
+      <div class="card rv stack"><span class="tag" style="justify-self:start">5</span><h3 class="h3">Загварын нэмэлт зохицуулалт</h3><p class="muted">Анхны загвараар тайлбарлагдаагүй корреляцын зөрүүг тодруулахын тулд тогтмол зардлыг загварт нэмж, шинэчилсэн загварын үр дүнг бодит өгөгдөлтэй дахин харьцуулан шалгасан.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S28 -->
+<section class="slide">
+  <span class="sn">28 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h2 class="h3 rv">Судалгааны таамаглал</h2>
+        <ul class="hyp rv">
+          <li><b>Таамаглал 1.</b><span>Цэвэр ашиг нь тухайн үеийн үйл ажиллагааны мөнгөн урсгалаас илүү ирээдүйн мөнгөн урсгалыг таамаглах чадвартай.</span></li>
+          <li><b>Таамаглал 2.</b><span>Үйл ажиллагааны мөнгөн мөчлөг уртсах тусам цэвэр ашиг болон мөнгөн урсгалын таамаглах чадварын ялгаа нэмэгдэнэ.</span></li>
+          <li><b>Таамаглал 3.</b><span>Үйл ажиллагааны мөнгөн урсгалын өөрчлөлт сөрөг хугацааны хамааралтай байна.</span></li>
+          <li><b>Таамаглал 4.</b><span>Аккруэл тохируулга нь мөнгөн урсгалын өөрчлөлттэй эсрэг хамааралтай бөгөөд түүний хэлбэлзлийг бууруулна.</span></li>
+          <li><b>Таамаглал 5.</b><span>Цэвэр ашиг болон аккруэл үзүүлэлтүүдийн өөрчлөлт ирээдүйн үйл ажиллагааны мөнгөн урсгалтай эерэг хамааралтай байна.</span></li>
+        </ul></div>
+      <div class="stack"><h2 class="h3 rv">Хэрэгжүүлсэн зохицуулалт</h2>
+        <p class="muted rv">Судлаачид онолын загварыг бодит нөхцөлд нийцүүлэх зорилгоор дараах зохицуулалтыг хийсэн.</p>
+        <div class="card rv stack"><b>Аккруэл тохируулга:</b><p class="muted">Авлага, өглөг, бараа материалын өөрчлөлтийг загварт тусгасан.</p><div class="fx" style="color:var(--accr);font-weight:600">Аккруэл = ΔАвлага + ΔБараа материал − ΔӨглөг</div></div>
+        <ul class="clean rv">
+          <li><b>Тогтмол зардал:</b> Хувьсах зардлаас гадна тогтмол зардлын нөлөөг загварт нэмж тооцсон.</li>
+          <li><b>Өгөгдлийн тохируулга:</b> Хувьцааны хуваалт, капиталын өөрчлөлтийг харгалзаж, хэт их хэлбэлзэлтэй ажиглалтын 1%-ийг хассан.</li>
+          <li><b>Мөнгөн урсгалын баталгаажуулалт:</b> Өөр хэмжүүр ашиглан давтан шинжилгээ хийхэд түүвэр 1,337-оос 667 компани болж буурсан ч үндсэн үр дүн өөрчлөгдөөгүй.</li>
+          <li><b>Элэгдлийн нөлөө:</b> Элэгдлийн аккруэл үзүүлэлтийг оруулсан болон хассан хувилбаруудыг харьцуулж, үндсэн үр дүнгийн тогтвортой байдлыг шалгасан.</li>
+        </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- S29 -->
+<section class="slide">
+  <span class="sn">29 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div><h2 class="h2 rv">Хэрэгжүүлсэн зохицуулалт</h2></div>
+    <div class="tblwrap rv"><table class="t min">
+      <thead><tr><th>Арга хэмжээ</th><th>Хэрхэн хэрэгжүүлсэн бэ?</th><th>Ямар зорилготой вэ?</th></tr></thead>
+      <tbody>
+        <tr><td>Мөнгөн орлого, зарлагын хугацааны зөрүүг тооцох шаардлагатай.</td><td>Авлага, бараа материал, өглөгийн өөрчлөлтийг аккруэл тохируулгад тусгасан.</td><td>Цэвэр ашиг ба мөнгөн урсгалын хамаарлыг бодитой загварчлах.</td></tr>
+        <tr><td>Бодит үйл ажиллагааны зардал зөвхөн хувьсах зардлаас бүрддэггүй.</td><td>Борлуулалтаас үл хамаарах тогтмол зардлыг загварт нэмж оруулсан.</td><td>Зардлын бүтцийн мөнгөн урсгал, ашгийн хамааралд үзүүлэх нөлөөг тодорхойлох.</td></tr>
+        <tr><td>Хувьцааны өөрчлөлт болон хэт хэлбэлзэлтэй өгөгдөл шинжилгээний үр дүнд нөлөөлж болзошгүй.</td><td>Хувьцааны хуваалт, капиталын өөрчлөлтөд тохируулж, захын 1%-ийн ажиглалтыг хассан.</td><td>Өгөгдлийн харьцуулах боломж, шинжилгээний найдвартай байдлыг сайжруулах.</td></tr>
+        <tr><td>Мөнгөн урсгалын хэмжилтийн аргачлал үр дүнд нөлөөлж болзошгүй.</td><td>Өөр мөнгөн урсгалын хэмжүүрээр давтан шинжилж, 667 компанийн үр дүнг харьцуулсан.</td><td>Үндсэн үр дүнгийн тогтвортой байдлыг баталгаажуулах.</td></tr>
+        <tr><td>Онолын загварт элэгдлийн аккруэл тусгагдаагүй ч бодит өгөгдөлд багтсан.</td><td>Элэгдлийн аккруэлтэй болон аккруэлгүй хувилбаруудыг харьцуулсан.</td><td>Элэгдлийн нөлөөг шалгаж, загварын үр дүнг баталгаажуулах.</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- S30 descriptive -->
+<section class="slide">
+  <span class="sn">30 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Descriptive Statistics on Selected Variables - Судалгааны үндсэн хувьсагчдын тодорхойлох статистик</h2></div>
+    <div class="grid2">
+      <div class="chart rv"><h4>Дундаж</h4><p class="sub">ам.доллар / хувьцаа</p><div class="hb" id="c30a" style="--lw:150px"></div></div>
+      <div class="chart rv"><h4>Өөрчлөлтийн дисперс</h4><p class="sub">эхний ялгаврын өөрчлөлт</p><div class="hb" id="c30b" style="--lw:150px"></div></div>
+    </div>
+    <div class="grid2" style="align-items:start">
+      <p class="rv">1,337 компанийн цэвэр ашиг, үйл ажиллагааны мөнгөн урсгал, аккруэл болон борлуулалтын үндсэн статистик үзүүлэлтүүдээс үйл ажиллагааны мөнгөн урсгалын дундаж 1.63 ам.доллар байгаа нь цэвэр ашгийн 1.13 ам.доллараас өндөр байна. Харин мөнгөн урсгал болон аккруэл үзүүлэлтүүдийн өөрчлөлтийн дисперс цэвэр ашгийнхаас харьцангуй өндөр байна.</p>
+      <div class="callout rv"><p>Энэ нь аккруэл бүртгэл мөнгөн урсгалын хэлбэлзлийг зөөлрүүлж, цэвэр ашгийг харьцангуй тогтвортой илэрхийлэхэд нөлөөлдөг гэсэн судалгааны үндэслэлийг дэмжиж байна.</p></div>
+    </div>
+    <p class="note">Нэгж: ам.доллар / хувьцаа. Дисперс нь тухайн үзүүлэлтийн эхний ялгаврын өөрчлөлтөөр тооцогдсон.</p>
+  </div>
+</section>
+
+<!-- S31 params -->
+<section class="slide">
+  <span class="sn">31 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Descriptive Statistics on Model Parameters - Судалгааны загварын үндсэн параметрүүд</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="chart rv"><h4>Параметр · Дундаж утга</h4><div class="hb" id="c31" style="--lw:190px"></div></div>
+      <div class="stack">
+        <div class="tblwrap rv"><table class="t"><thead><tr><th>Параметр</th><th>Тайлбар</th></tr></thead><tbody>
+          <tr><td>Profit Margin (p)</td><td>Борлуулалтад ногдох ашгийн маржин</td></tr>
+          <tr><td>Accounts Receivable (a)</td><td>Авлагын эзлэх хувь</td></tr>
+          <tr><td>Accounts Payable (b)</td><td>Өглөгийн эзлэх хувь</td></tr>
+          <tr><td>Inventory (c1)</td><td>Зорилтот бараа материалын түвшний параметр</td></tr>
+          <tr><td>Operating Cash Cycle (d)</td><td>Үйл ажиллагааны мөнгөн мөчлөгийн хугацааны харьцаа</td></tr></tbody></table></div>
+      </div>
+    </div>
+    <div class="stack narrow">
+      <p class="rv">Судалгаанд хамрагдсан компаниудын дундаж ашгийн маржин 4.95%, авлагын параметр 15%, өглөгийн параметр 7% байна.</p>
+      <p class="rv">Үйл ажиллагааны мөнгөн мөчлөгийн параметр дунджаар жилийн 23%-тай тэнцэж байгаа нь авлага, бараа материал, өглөгийн хугацааны зөрүү мөнгөн урсгалд нөлөөлж байгааг харуулна.</p>
+      <p class="rv">Эдгээр параметрийг ашиглан компанийн мөнгөн урсгал болон цэвэр ашгийн хамаарлыг загварчилсан.</p>
+    </div>
+  </div>
+</section>
+
+<!-- S32 forecast -->
+<section class="slide">
+  <span class="sn">32 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Current Operating Cash Flows and Earnings as Predictors of Future Cash Flows - Ирээдүйн мөнгөн урсгалыг таамаглах чадварын харьцуулалт</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="chart rv"><h4>Panel A – Таамаглалын алдааны харьцуулалт</h4><p class="sub">Үзүүлэлт нь таамаглалын алдааны стандарт хазайлт, ам.доллар/хувьцаа.</p>
+        <div class="legend"><span class="key"><i style="background:var(--cash)"></i>Мөнгөн урсгалаар таамагласан алдаа</span><span class="key"><i style="background:var(--earn)"></i>Цэвэр ашгаар таамагласан алдаа</span></div>
+        <svg class="svgchart" id="c32" viewBox="0 0 560 300" role="img" aria-label="Таамаглалын алдаа: 1 жил 1.89 ба 1.60, 2 жил 2.06 ба 1.59, 3 жил 2.10 ба 1.65"></svg>
+        <div class="tblwrap"><table class="t"><thead><tr><th>Таамаглах хугацаа</th><th>Мөнгөн урсгалаар таамагласан алдаа</th><th>Цэвэр ашгаар таамагласан алдаа</th><th>Ялгаа</th></tr></thead><tbody>
+          <tr><td>1 жил</td><td class="n">1.89</td><td class="n">1.60</td><td class="n">0.29</td></tr>
+          <tr><td>2 жил</td><td class="n">2.06</td><td class="n">1.59</td><td class="n">0.47</td></tr>
+          <tr><td>3 жил</td><td class="n">2.10</td><td class="n">1.65</td><td class="n">0.46</td></tr></tbody></table></div>
+      </div>
+      <div class="stack">
+        <p class="rv"><b>Тайлбар:</b> Цэвэр ашгаар таамагласан ирээдүйн мөнгөн урсгалын алдаа бүх хугацаанд бага байна.</p>
+        <p class="rv">Жишээлбэл, нэг жилийн дараах мөнгөн урсгалыг таамаглахад:</p>
+        <div class="tiles rv"><div class="tile cash"><b>1.89</b><span>Мөнгөн урсгал ашигласан алдаа</span></div><div class="tile earn"><b>1.60</b><span>Цэвэр ашиг ашигласан алдаа</span></div></div>
+        <p class="rv">Өөрөөр хэлбэл, цэвэр ашиг ашигласан загварын таамаглалын алдаа 0.29 ам.доллараар бага байна.</p>
+        <p class="rv muted">Мөн үйл ажиллагааны мөнгөн мөчлөг урттай компаниудын бүлэгт энэ ялгаа ерөнхийдөө илүү өндөр байсан.</p>
+      </div>
+    </div>
+    <div class="grid2" style="align-items:start">
+      <div class="chart rv"><h4>Panel B – Регрессийн шинжилгээ</h4>
+        <div class="coef" id="c32b"></div></div>
+      <div class="stack">
+        <p class="rv"><b>Тайлбар:</b> Цэвэр ашгийн коэффициент бүх хугацаанд эерэг бөгөөд статистикийн ач холбогдолтой байна. Мөнгөн урсгалын коэффициент хоёр болон гурван жилийн таамаглалд сөрөг гарсан нь мөнгөн урсгалын өөрчлөлтийн сөрөг хугацааны хамааралтай холбоотой.</p>
+        <p class="rv">Цэвэр ашгийн коэффициент 0.45 байгаа нь тухайн үеийн ашиг ирээдүйн мөнгөн урсгалыг тайлбарлах нэмэлт мэдээлэл агуулж байгааг харуулна.</p>
+        <p class="rv">Adjusted R² хугацаа уртсахад буурч байгаа нь ирээдүйн мөнгөн урсгалыг хол хугацаагаар таамаглахад загварын тайлбарлах чадвар буурч байгааг илэрхийлнэ.</p>
+      </div>
+    </div>
+    <div class="callout earn rv"><b class="lbl">Судалгааны гол дүгнэлт</b><p>Цэвэр ашиг нь үйл ажиллагааны мөнгөн урсгалыг дангаар нь ашигласнаас илүү ирээдүйн мөнгөн урсгалыг таамаглах мэдээлэл агуулдаг. Энэхүү давуу тал нь аккруэл үзүүлэлттэй холбоотой.</p></div>
+  </div>
+</section>
+
+<!-- S33 correlations -->
+<section class="slide">
+  <span class="sn">33 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Predicted and Actual Values of Serial Correlations and Cross-correlations - Цэвэр ашиг, мөнгөн урсгал, аккруэл үзүүлэлтүүдийн корреляцын шинжилгээ</h2>
+    <p class="lede rv">Судлаачид онолын загвараар таамагласан корреляцын үзүүлэлтүүдийг бодит өгөгдлөөр тооцсон үр дүнтэй харьцуулсан.</p></div>
+    <div class="chart rv"><div class="legend"><span class="key"><i style="background:var(--surface);border:2.5px solid var(--earn);border-radius:50%"></i>Загварын таамагласан</span><span class="key"><i style="background:var(--fg);border-radius:50%"></i>Бодит үр дүн</span></div>
+      <div class="dumb" id="c33"></div></div>
+    <div class="grid2" style="align-items:start">
+      <p class="rv"><b>Тайлбар:</b> Мөнгөн урсгалын өөрчлөлт сөрөг хугацааны хамааралтай (-0.28) байна. Аккруэл болон мөнгөн урсгалын тухайн үеийн өөрчлөлтийн хамаарал хүчтэй сөрөг (-0.88) гарсан. Цэвэр ашгийн өөрчлөлтийн хугацааны хамаарал бараг тэгтэй тэнцүү (-0.02) байна. Аккруэл өөрчлөлт болон ирээдүйн мөнгөн урсгалын өөрчлөлт эерэг хамааралтай (0.31) байна. Харин цэвэр ашиг болон тухайн үеийн, ирээдүйн мөнгөн урсгалын өөрчлөлтийн зарим хамаарал онолын загварын таамаглалаас зөрсөн.</p>
+      <div class="callout rv"><b class="lbl">Дүгнэлт</b><p>Аккруэл тохируулга нь мөнгөн урсгалын сөрөг хугацааны хамаарлыг бууруулж, цэвэр ашгийн өөрчлөлтийг харьцангуй тогтвортой болгоход нөлөөлдөг.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S34 -->
+<section class="slide">
+  <span class="sn">34 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Correlation Between Predicted and Actual Correlations - Загварын таамаглал ба бодит үр дүнгийн хамаарал</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack">
+        <p class="rv">Судлаачид онолын загвараас гаргасан корреляцын таамаглал нь компаниудын бодит корреляцын үр дүнтэй хэр нийцэж байгааг шалгасан.</p>
+        <p class="rv muted">Үр дүнг компанийн түвшин, урьдчилан тооцсон корреляцаар байгуулсан багц болон салбарын түвшинд харьцуулсан.</p>
+        <div class="callout rv"><b class="lbl">Тайлбар</b><p>Онолын загвар нь бүх компанийн бодит үр дүнг бүрэн тайлбарлаж чадахгүй боловч мөнгөн урсгал, аккруэл болон ашгийн корреляцын хамаарлыг тодорхой хэмжээнд тайлбарлах боломжтой байгааг харуулсан.</p></div>
+      </div>
+      <div class="chart rv"><h4>Үр дүн</h4>
+        <div class="lvl"><span>Компанийн түвшинд 6 хамаарлаас 3 нь эерэг бөгөөд статистикийн ач холбогдолтой.</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></span></div>
+        <div class="lvl"><span>Багцын түвшинд 6 хамаарлаас 3 нь эерэг бөгөөд статистикийн ач холбогдолтой.</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></span></div>
+        <div class="lvl"><span>Салбарын түвшинд мөн 3 хамаарал статистикийн ач холбогдолтой.</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S35 + S36 -->
+<section class="slide">
+  <span class="sn">35–36 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Descriptive Statistics on Model Parameters - Тогтмол зардлын загварын параметрийн үнэлгээ</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="tiles rv"><div class="tile accr"><b>7.59%</b><span>Тогтмол зардал болон аккруэл таамаглалын алдааны нөлөөллийг илэрхийлэх m</span></div><div class="tile accr"><b>17.18%</b><span>Contribution Margin (CM)</span></div></div>
+      <p class="rv"><b>Тайлбар:</b> Судалгаанд тогтмол зардлыг тооцох зорилгоор борлуулалт болон цэвэр ашгийн хоорондын регрессийн хамаарлыг ашигласан.Үүний үр дүнд компанийн борлуулалт, тогтмол зардлын хэлбэлзлийн нөлөөг загварт тусгасан.</p>
+    </div>
+    <div style="padding-top:clamp(24px,4vw,48px)"><h2 class="h2 rv">Predicted and Actual Values of Correlations – Modified Model - Тогтмол зардал нэмсэн загварын үр дүн</h2></div>
+    <div class="chart rv"><div class="legend"><span class="key"><i style="background:var(--surface);border:2.5px solid var(--earn);border-radius:50%"></i>Анхны загвар</span><span class="key"><i style="background:var(--surface);border:2.5px solid var(--cash);border-radius:50%"></i>Тогтмол зардал нэмсэн загвар</span><span class="key"><i style="background:var(--fg);border-radius:50%"></i>Бодит үр дүн</span></div>
+      <div class="dumb" id="c36" style="--lw:280px"></div></div>
+    <div class="stack narrow">
+      <p class="rv"><b>Тайлбар:</b>Анхны загварын таамаглалыг тогтмол зардал нэмсний дараа дахин тооцож, бодит өгөгдөлтэй харьцуулсан.</p>
+      <p class="rv">Тогтмол зардлыг загварт нэмснээр дараах өөрчлөлтүүд гарсан.</p>
+      <ul class="clean rv">
+        <li>Цэвэр ашиг болон тухайн үеийн мөнгөн урсгалын хамаарлын тэмдэг сөргөөс эерэг болж, бодит үр дүнтэй (0.15) ойртсон.</li>
+        <li>Цэвэр ашиг болон ирээдүйн мөнгөн урсгалын хамаарал 0.61-ээс 0.25 болж буурсан.</li>
+        <li>Аккруэл болон тухайн үеийн мөнгөн урсгалын хамаарал -0.92-оос -0.63 болж өөрчлөгдсөн.</li>
+        <li>Загварын таамагласан корреляцын тэмдэг 7 хамаарлын 6-д бодит үр дүнтэй нийцсэн.</li>
+        <li>Гэхдээ цэвэр ашгийн хугацааны корреляцын бодит утга -0.02 байхад загвар -0.30 гэж таамагласан тул энэ үзүүлэлтийг хангалттай тайлбарлаж чадаагүй.</li>
+      </ul>
+      <div class="callout rv"><p>Тогтмол зардлыг загварт оруулснаар онолын таамаглал болон бодит өгөгдлийн хоорондын зөрүү ерөнхийдөө багассан боловч бүх үзүүлэлтийг бүрэн тайлбарлаж чадаагүй.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S37 summary -->
+<section class="slide">
+  <span class="sn">37 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">5. Өгүүлэл 1 - The relation between earnings and cash flows</div>
+    <h2 class="h2 rv">Судалгааны үр дүн нэгтгэл</h2></div>
+    <div class="find">
+      <div class="card rv"><span class="no">№ 1</span><h4>Цэвэр ашиг мөнгөн урсгалаас тогтвортой</h4><span class="k">Өөрчлөлтийн дисперс: Earnings 0.85, CFO 4.94</span><span class="d">Ашиг харьцангуй тогтвортой</span></div>
+      <div class="card rv"><span class="no">№ 2</span><h4>Цэвэр ашгийн таамаглах чадвар өндөр</h4><span class="k">Регрессийн коэффициент: 0.45</span><span class="d">Ирээдүйн CFO-г тайлбарлахад чухал</span></div>
+      <div class="card rv"><span class="no">№ 3</span><h4>Таамаглах алдаа бага</h4><span class="k">1 жилийн алдаа: 1.60 ба 1.89</span><span class="d">Цэвэр ашиг давуу</span></div>
+      <div class="card rv"><span class="no">№ 4</span><h4>CFO сөрөг хугацааны хамааралтай</h4><span class="k">Корреляц: -0.28</span><span class="d">Мөнгөн урсгал хэлбэлзэлтэй</span></div>
+      <div class="card rv"><span class="no">№ 5</span><h4>Аккруэл мөнгөн урсгалын хэлбэлзлийг нөхдөг</h4><span class="k">Корреляц: -0.88</span><span class="d">Аккруэл тохируулгын нөлөө өндөр</span></div>
+      <div class="card rv"><span class="no">№ 6</span><h4>Тогтмол зардал загварын тайлбарлах чадварыг сайжруулсан</h4><span class="k">7 хамаарлын 6-д тэмдэг таарсан</span><span class="d">Загвар бодит нөхцөлд илүү нийцсэн</span></div>
+    </div>
+    <p class="note">Судалгааны үр дүн · Гол тоон үзүүлэлт · Дүгнэлт</p>
+    <div class="callout earn rv"><p>Dechow, Kothari болон Watts (1998) нарын судалгаагаар цэвэр ашиг нь тухайн үеийн үйл ажиллагааны мөнгөн урсгалаас илүү ирээдүйн мөнгөн урсгалыг таамаглах чадвартай болохыг тогтоосон. Үүний гол шалтгаан нь аккруэл бүртгэл мөнгөн орлого, зарлагын хугацааны зөрүүг нөхөж, ирээдүйн мөнгөн урсгалын талаарх мэдээллийг тухайн үеийн ашигт тусгадагтай холбоотой. Мөн компанийн үйл ажиллагааны мөнгөн мөчлөг болон зардлын бүтэц нь энэхүү хамааралд нөлөөлдөг болохыг харуулсан.</p></div>
+    <p class="small muted">Судалгааны эх сурвалж: <a href="https://urresearch.rochester.edu/institutionalPublicationPublicView.action?institutionalItemId=4392&amp;versionNumber=1" target="_blank" rel="noopener" style="word-break:break-all">https://urresearch.rochester.edu/institutionalPublicationPublicView.action?institutionalItemId=4392&amp;versionNumber=1</a></p>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 6 Article 2 ============ -->
+<section class="chapter" id="ch6">
+  <span class="sn">38 / 60</span>
+  <div class="wrap">
+    <div class="kicker rv">6. Өгүүлэл 2</div>
+    <div class="paper">
+      <h2 class="ptitle rv">What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</h2>
+      <div class="meta rv">
+        <div><small>Нийтлэгдсэн огноо</small><span class="yr">2023</span></div>
+        <div><small>Сэтгүүл</small><span>Cogent Business &amp; Management</span></div>
+        <div><small>Судлаачид</small><span>Фабио Альбукерке (Fábio Albuquerque), Ана Рита Велез (Ana Rita Velez), Вера Пинто (Vera Pinto)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide">
+  <span class="sn">38 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h2 class="h2 rv">Судалгааны үндэслэл</h2>
+        <p class="rv">Санхүүгийн тайлан ашигладаг хөрөнгө оруулагч, удирдлага, санхүүгийн шинжээчид компанийн бодит санхүүгийн байдлыг үнэлэхдээ ашиг, алдагдал болон мөнгөн гүйлгээний мэдээллийг ашигладаг. Гэвч эдгээр хоёр үзүүлэлт ижил мэдээлэл өгдөггүй.</p></div>
+      <div class="vs" style="grid-template-columns:1fr">
+        <div class="card c-earn rv stack"><h3 class="h3" style="font-size:20px;margin:0">Ашиг, алдагдал (P&amp;L)</h3><p class="muted">Орлогоос зардлыг хасаж тооцсон нягтлан бодох бүртгэлийн үр дүн. Мөнгөн орлого, зарлага бодитоор хийгдээгүй байсан ч хуримтлалын зарчмаар бүртгэгдэж болно.</p></div>
+        <div class="card c-cash rv stack"><h3 class="h3" style="font-size:20px;margin:0">Үйл ажиллагааны мөнгөн гүйлгээ (OCF)</h3><p class="muted">Компанийн үндсэн үйл ажиллагаанаас бодитоор орж ирсэн болон гарсан мөнгөн хөрөнгийн цэвэр дүн.</p></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <p class="h3 rv" style="font-weight:500">Хувьцааны үнэд ашиг, алдагдал илүү нөлөөлдөг үү, эсвэл мөнгөн гүйлгээ илүү нөлөөлдөг үү?</p>
+      <p class="h3 rv" style="font-weight:500">Ирээдүйн мөнгөн гүйлгээг өмнөх ашиг, алдагдлаар таамаглах нь зөв үү, эсвэл өмнөх мөнгөн гүйлгээгээр таамаглах зөв үү?</p>
+    </div>
+    <div class="callout rv"><b class="lbl">Судалгааны үндэслэлийн гол санаа</b><p>Компанийн ашигтай ажиллаж байгаа эсэхээс гадна бодит мөнгөн хөрөнгө бий болгож байгаа эсэх нь хөрөнгө оруулалтын шийдвэрт чухал нөлөөтэй.</p></div>
+    <p class="rv muted narrow">Энэ асуудлыг судлах болсон өөр нэг шалтгаан нь IASB буюу Олон улсын нягтлан бодох бүртгэлийн стандартын зөвлөл санхүүгийн тайлангийн танилцуулга, мөнгөн гүйлгээний ангиллыг сайжруулах санал дэвшүүлсэнтэй холбоотой.</p>
+  </div>
+</section>
+
+<!-- S39 + S40 -->
+<section class="slide">
+  <span class="sn">39–40 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h2 class="h2 rv">Судалгааны зорилго</h2>
+        <p class="rv">Судалгааны үндсэн зорилго нь ашиг, алдагдлын үзүүлэлт болон мөнгөн гүйлгээний үзүүлэлтүүдийн мэдээллийн ач холбогдлыг харьцуулан тодорхойлох юм. Үүнийг хоёр үндсэн зорилт болгон авч үзсэн.</p>
+        <div class="card rv stack"><b>Зорилт 1. Хувьцааны үнэд үзүүлэх нөлөөг тодорхойлох</b><ul class="clean"><li>Ашиг, алдагдал хувьцааны үнэд хэрхэн нөлөөлж байгааг судлах.</li><li>Үйл ажиллагааны мөнгөн гүйлгээ хувьцааны үнэд хэрхэн нөлөөлж байгааг судлах.</li><li>Аль үзүүлэлт хувьцааны үнийг илүү сайн тайлбарлаж байгааг тодорхойлох.</li></ul></div>
+        <div class="card rv stack"><b>Зорилт 2. Ирээдүйн мөнгөн гүйлгээг таамаглах чадварыг тодорхойлох</b><ul class="clean"><li>Өмнөх үеийн ашиг, алдагдал ирээдүйн мөнгөн гүйлгээг хэр сайн таамаглаж байгааг судлах.</li><li>Өмнөх үеийн мөнгөн гүйлгээ ирээдүйн мөнгөн гүйлгээг хэр сайн таамаглаж байгааг судлах.</li></ul></div>
+        <p class="rv muted">Ингэснээр хөрөнгө оруулагч, санхүүгийн шинжээчид аль мэдээллийг илүү анхаарч ашиглах нь зүйтэйг тодорхойлохыг зорьжээ.</p>
+      </div>
+      <div class="stack"><h2 class="h2 rv">Судалгааны өгөгдөл</h2>
+        <p class="eyebrow" style="margin:0;color:var(--muted)">Судалгааны өгөгдлийн гол үзүүлэлт</p>
+        <div class="tiles rv" style="grid-template-columns:1fr 1fr"><div class="tile cash"><b>121</b><span>Компани</span></div><div class="tile cash"><b>484</b><span>Жилийн тайлан</span></div><div class="tile"><b>2018–2021</b><span>Судалгааны хугацаа</span></div><div class="tile"><b>6</b><span>Хөрөнгийн биржийн индекс</span></div></div>
+        <p class="eyebrow" style="margin:6px 0 0;color:var(--muted)">Судалгаанд хамрагдсан улсууд</p>
+        <div class="chips rv"><span class="chip">Франц</span><span class="chip">Нидерланд</span><span class="chip">Бельги</span><span class="chip">Ирланд</span><span class="chip">Норвеги</span><span class="chip">Португал</span></div>
+        <div class="tblwrap rv"><table class="t"><thead><tr><th>Үзүүлэлт</th><th>Утга</th></tr></thead><tbody>
+          <tr><td class="n">ESP</td><td>Компанийн хувьцааны үнэ</td></tr>
+          <tr><td class="n">BV PS</td><td>Нэгж хувьцаанд ногдох дансны үнэ</td></tr>
+          <tr><td class="n">P&amp;L PS</td><td>Нэгж хувьцаанд ногдох ашиг, алдагдал</td></tr>
+          <tr><td class="n">OCF PS</td><td>Нэгж хувьцаанд ногдох үйл ажиллагааны мөнгөн гүйлгээ</td></tr>
+          <tr><td class="n">OCF' PS</td><td>IASB-ийн саналд нийцүүлэн тохируулсан мөнгөн гүйлгээ</td></tr>
+          <tr><td class="n">NGM PS</td><td>Мөнгөн гүйлгээний Non-GAAP үзүүлэлт</td></tr>
+          <tr><td class="n">Lev</td><td>Өрийн нийт хөрөнгөд эзлэх хувь</td></tr></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S41 -->
+<section class="slide">
+  <span class="sn">41 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <h2 class="h2 rv">Судалгааны арга зүй</h2>
+    <p class="lede rv"><strong>Судлаачид тоон судалгааны аргыг ашигласан.</strong> Өөрөөр хэлбэл, компаниудын санхүүгийн тайлангаас тоон мэдээлэл цуглуулж, статистик загвар ашиглан хоорондын хамаарлыг тооцсон.</p></div>
+    <div class="callout rv"><b class="lbl">Ашигласан үндсэн арга</b><p><b>Шугаман регрессийн шинжилгээ (Linear Regression Analysis).</b> Энэ нь нэг үзүүлэлт нөгөө үзүүлэлтэд хэрхэн нөлөөлж байгааг тоон утгаар тодорхойлдог статистикийн арга юм.</p></div>
+    <p class="rv">Судалгаанд дараах хоёр үндсэн загварыг ашигласан.</p>
+    <div class="grid2">
+      <div class="card rv stack"><h3 class="h3">А. Хувьцааны үнийн хамаарлын шинжилгээ (Value Relevance)</h3><p class="muted">Хувьцааны үнэ нь ашиг, алдагдал болон мөнгөн гүйлгээний үзүүлэлтээс хэрхэн хамаарч байгааг шинжилсэн.</p></div>
+      <div class="card rv stack"><h3 class="h3">Б. Ирээдүйн мөнгөн гүйлгээний таамаглал (Predictive Value)</h3><p class="muted">Өмнөх жилүүдийн санхүүгийн үзүүлэлт ирээдүйн мөнгөн гүйлгээг хэр сайн таамаглаж байгааг шинжилсэн.</p>
+        <p class="small">Жишээ нь:</p>
+        <div class="yrs"><span>2018 оны мөнгөн гүйлгээ.</span><span>2019 оны мөнгөн гүйлгээ.</span><span>2020 оны мөнгөн гүйлгээ.</span><i>→</i><span class="t">2021</span></div>
+        <p class="small">Эдгээрийг ашиглан 2021 оны мөнгөн гүйлгээг таамагласан.</p>
+        <p class="small muted">Мөн өмнөх үеийн ашиг, алдагдлыг ашиглан ирээдүйн мөнгөн гүйлгээг таамаглах загвар байгуулсан.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- S42 -->
+<section class="slide">
+  <span class="sn">42 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <h2 class="h2 rv">Судалгааны таамаглал</h2><p class="lede rv">Судалгаанд хоёр үндсэн таамаглал дэвшүүлсэн.</p></div>
+    <div class="grid2 hcards">
+      <div class="card rv"><span class="hn">H1</span><b>H1 – Нэгдүгээр таамаглал</b><p>Ашиг, алдагдлын үзүүлэлт (P&amp;L) нь үйл ажиллагааны мөнгөн гүйлгээний үзүүлэлтээс (OCF) хувьцааны үнэд илүү их нөлөө үзүүлнэ.</p><p class="muted">Өөрөөр хэлбэл, хөрөнгө оруулагчид компанийн бодит мөнгөн гүйлгээнээс илүү ашиг, алдагдлын мэдээллийг чухалчилна гэж таамагласан.</p><span class="sum">H1: P&amp;L илүү ач холбогдолтой</span></div>
+      <div class="card rv"><span class="hn">H2</span><b>H2 – Хоёрдугаар таамаглал</b><p>Өмнөх үеийн ашиг, алдагдлын үзүүлэлт (P&amp;L) нь өмнөх үеийн үйл ажиллагааны мөнгөн гүйлгээний үзүүлэлтээс (OCF) ирээдүйн мөнгөн гүйлгээг илүү сайн таамаглана.</p><p class="muted">Өөрөөр хэлбэл, компанийн ирээдүйн мөнгөн урсгалыг таамаглахад өмнөх үеийн ашиг илүү мэдээлэл өгнө гэж үзсэн.</p><span class="sum">H2: P&amp;L илүү сайн таамаглагч</span></div>
+    </div>
+    <p class="note rv">Эдгээр нь судлаачдын урьдчилан дэвшүүлсэн таамаглал юм. Судалгааны үр дүнгээр батлагдсан эсэхийг дараагийн хэсэгт авч үзнэ.</p>
+  </div>
+</section>
+
+<!-- S43 -->
+<section class="slide">
+  <span class="sn">43 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <h2 class="h2 rv">Хэрэгжүүлсэн зохицуулалт</h2>
+    <p class="lede rv">Гол зорилго нь санхүүгийн тайлангийн ил тод байдал, харьцуулах боломж, мэдээллийн чанарыг сайжруулах юм.</p></div>
+    <div class="stack"><b class="rv">IASB-ийн санал болгосон гол зохицуулалтууд:</b>
+    <div class="tblwrap rv"><table class="t"><thead><tr><th>Зохицуулалт</th><th>Тайлбар</th></tr></thead><tbody>
+      <tr><td>Хүүгийн төлбөр</td><td><span class="chip" style="background:var(--earn-soft);color:var(--earn)">Санхүүжилт</span>&nbsp; Санхүүжилтийн үйл ажиллагааны мөнгөн гүйлгээнд ангилах</td></tr>
+      <tr><td>Төлсөн ногдол ашиг</td><td><span class="chip" style="background:var(--earn-soft);color:var(--earn)">Санхүүжилт</span>&nbsp; Санхүүжилтийн үйл ажиллагаанд ангилах</td></tr>
+      <tr><td>Хүлээн авсан хүү</td><td><span class="chip" style="background:var(--accr-soft);color:var(--accr)">Хөрөнгө оруулалт</span>&nbsp; Хөрөнгө оруулалтын үйл ажиллагаанд ангилах</td></tr>
+      <tr><td>Хүлээн авсан ногдол ашиг</td><td><span class="chip" style="background:var(--accr-soft);color:var(--accr)">Хөрөнгө оруулалт</span>&nbsp; Хөрөнгө оруулалтын үйл ажиллагаанд ангилах</td></tr>
+      <tr><td>Шууд бус арга</td><td>Үйл ажиллагааны ашгийг тооцооны эхлэл болгон ашиглах</td></tr>
+      <tr><td>Non-GAAP мэдээлэл</td><td>Санхүүгийн тайлангийн үзүүлэлттэй уялдуулан ил тод тайлагнах</td></tr>
+      <tr><td>Мөнгөн гүйлгээний ангилал</td><td>Компаниудын ангиллын сонголтыг хязгаарлаж, харьцуулах боломжийг нэмэгдүүлэх</td></tr></tbody></table></div></div>
+    <p class="note rv narrow">Өгүүлэлд тухайн үед шинэ стандартыг 2027 оны 1-р сарын 1-нээс эхлэх жилийн тайлангийн хугацаанд хэрэглэхээр төлөвлөсөн гэж дурдсан. Энэ нь судалгааны өгүүлэлд туссан тухайн үеийн зохицуулалтын мэдээлэл юм.</p>
+  </div>
+</section>
+
+<!-- S44 -->
+<section class="slide">
+  <span class="sn">44 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <h2 class="h2 rv">Санхүүгийн үзүүлэлтүүдийн дундаж утга</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="chart rv"><h4>Үзүүлэлт · Дундаж</h4><div class="hb" id="c44" style="--lw:110px"></div></div>
+      <div class="stack">
+        <div class="tiles rv"><div class="tile"><b>28.09</b><span>BV PS</span></div><div class="tile"><b>0.56</b><span>Lev</span></div></div>
+        <div class="card rv stack"><b>Тайлбар:</b><ul class="clean"><li>OCF болон OCF' бараг ижил түвшинд байна.</li><li>OCF нь P&amp;L-ээс өндөр дундажтай байна.</li><li>NGM нь OCF болон OCF'-ээс ойролцоогоор хоёр дахин бага байна.</li></ul>
+          <p>Энэ нь компанийн тайлагнасан ашиг, бодитоор бий болгосон мөнгөн урсгал хоёрын хооронд ялгаа байгааг харуулж байна.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S45 -->
+<section class="slide">
+  <span class="sn">45 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <h2 class="h2 rv">Ирээдүйн ашиг, алдагдлын таамаглал</h2>
+    <p class="lede rv">Энэ хүснэгтэд өмнөх үеийн OCF, OCF', NGM болон P&amp;L үзүүлэлтээр ирээдүйн P&amp;L-ийг таамагласан.</p></div>
+    <div class="chart rv"><div class="legend"><span class="key"><i style="background:var(--cash-soft);border:1px solid var(--cash)"></i>Тодорхойлох коэффициент (R²)</span><span class="key"><i style="background:var(--cash)"></i>Засварласан тодорхойлох коэффициент (Adjusted R²)</span></div>
+      <div class="hb" id="c45" style="--lw:110px"></div></div>
+    <div class="callout rv"><p>Загваруудын Adjusted R² 22–33%-ийн хооронд байсан. Энэ нь ирээдүйн ашиг, алдагдлыг таамаглах чадвар харьцангуй сул байсныг харуулна.</p></div>
+  </div>
+</section>
+
+<!-- S46 -->
+<section class="slide">
+  <span class="sn">46 / 60</span>
+  <div class="wrap gap-l">
+    <div class="eyebrow">6. Өгүүлэл 2 - What is more relevant? A comparison of cashflows indicators versus profit or loss from listed European companies</div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h2 class="h3 rv">Хувьцааны үнэд үзүүлэх нөлөө</h2>
+        <div class="chart rv"><h4>Тайлбарлах чадвар</h4><div class="big2 pending" data-bars>
+          <div class="r"><div class="top"><span>Мөнгөн гүйлгээ (OCF)</span><b style="color:var(--cash)">Ойролцоогоор 40%</b></div><div class="tr"><i style="width:40%;background:var(--cash)"></i></div></div>
+          <div class="r"><div class="top"><span>Ашиг, алдагдал (P&amp;L)</span><b style="color:var(--earn)">Ойролцоогоор 20%</b></div><div class="tr"><i style="width:20%;background:var(--earn)"></i></div></div>
+        </div></div>
+        <p class="rv">Судалгаагаар үйл ажиллагааны мөнгөн гүйлгээ (OCF) нь ашиг, алдагдлын үзүүлэлтээс илүү хувьцааны үнийг тайлбарлах чадвартай гарсан.</p>
+        <p class="rv muted">Энэ нь мөнгөн гүйлгээний мэдээлэл хувьцааны үнийн өөрчлөлтийг тайлбарлахдаа ашиг, алдагдлаас ойролцоогоор хоёр дахин өндөр чадвартай байсныг харуулж байна.</p>
+      </div>
+      <div class="stack"><h2 class="h3 rv">Ирээдүйн мөнгөн гүйлгээг таамаглах чадвар</h2>
+        <div class="chart rv"><h4>Таамаглах чадвар</h4><div class="big2 pending" data-bars>
+          <div class="r"><div class="top"><span>Өмнөх үеийн мөнгөн гүйлгээ</span><b style="color:var(--cash)">Ойролцоогоор 90%</b></div><div class="tr"><i style="width:90%;background:var(--cash)"></i></div></div>
+          <div class="r"><div class="top"><span>Өмнөх үеийн ашиг, алдагдал</span><b style="color:var(--earn)">Ойролцоогоор 80%</b></div><div class="tr"><i style="width:80%;background:var(--earn)"></i></div></div>
+        </div></div>
+        <p class="rv">Судалгаагаар өмнөх үеийн мөнгөн гүйлгээ нь ирээдүйн мөнгөн гүйлгээг таамаглахдаа ашиг, алдагдлаас илүү үр дүнтэй гарсан.</p>
+        <p class="rv muted">Энэ нь компанийн өмнөх үеийн бодит мөнгөн гүйлгээ нь дараагийн үеийн мөнгөн гүйлгээний талаар илүү найдвартай мэдээлэл өгч байгааг харуулж байна.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S47 -->
+<section class="slide">
+  <span class="sn">47 / 60</span>
+  <div class="wrap gap-l">
+    <div><div class="eyebrow">6. Өгүүлэл 2</div><h2 class="h2 rv">6. Судалгааны дүгнэлт</h2></div>
+    <div class="grid2" style="align-items:start">
+      <div class="stack"><h3 class="h3 rv">Ирээдүйн ашиг, алдагдлыг таамаглах үр дүн</h3>
+        <p class="rv">Судалгааны нэмэлт шинжилгээгээр өмнөх үеийн мөнгөн гүйлгээ болон ашиг, алдагдлын аль аль нь ирээдүйн ашиг, алдагдлыг өндөр нарийвчлалтай таамаглаж чадаагүй.</p>
+        <p class="rv"><b>Эдгээр загварын тайлбарлах чадвар 35%-иас доогуур байжээ.</b></p>
+        <p class="rv muted">Энэ нь ирээдүйн ашгийг зөвхөн өнгөрсөн үеийн ашиг эсвэл мөнгөн гүйлгээгээр таамаглахад хангалтгүй гэдгийг харуулж байна.</p></div>
+      <div class="tblwrap rv"><table class="t"><thead><tr><th>Судалгааны асуудал</th><th>Үр дүн</th></tr></thead><tbody>
+        <tr><td>Хувьцааны үнэд аль нь илүү нөлөөлөх вэ?</td><td><span class="chip" style="background:var(--cash);color:#fff">OCF</span></td></tr>
+        <tr><td>Ирээдүйн мөнгөн гүйлгээг аль нь илүү сайн таамаглах вэ?</td><td><span class="chip" style="background:var(--cash);color:#fff">OCF</span></td></tr>
+        <tr><td>Ирээдүйн ашиг, алдагдлыг таамаглах чадвар</td><td>Хоёулаа харьцангуй сул</td></tr>
+        <tr><td>IASB-ийн шинэчилсэн OCF-ийн нөлөө</td><td>Таамаглах чадварт мэдэгдэхүйц өөрчлөлтгүй</td></tr>
+        <tr><td>Хоёр таамаглал</td><td><span class="verdict">Хоёулаа няцаагдсан</span></td></tr></tbody></table></div>
+    </div>
+    <div class="callout rv"><b class="lbl">Судалгааны гол дүгнэлт:</b><p>Компанийн санхүүгийн байдлыг үнэлэхдээ зөвхөн ашиг, алдагдлын тайланд үндэслэх нь хангалтгүй. Үйл ажиллагааны мөнгөн гүйлгээ нь компанийн бодит мөнгөн хөрөнгө бий болгох чадварыг илэрхийлдэг бөгөөд хөрөнгө оруулалтын шийдвэр гаргах, хувьцааны үнийг үнэлэх, ирээдүйн мөнгөн урсгалыг таамаглахад илүү ач холбогдолтой мэдээлэл өгдөг.</p></div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 7 comparison ============ -->
+<section class="chapter" id="ch7">
+  <span class="sn">48 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">7</div>
+    <h2 class="rv">Өгүүллийн харьцуулалт</h2>
+    <div class="tl rv" id="tl" aria-label="Судалгаа 1: 1963–1992, Судалгаа 2: 2018–2021"></div>
+  </div>
+</section>
+<section class="slide" style="padding-top:20px">
+  <div class="wrap">
+    <div class="cmp" id="cmp">
+      <div class="hdr"><div><i style="background:var(--earn)"></i>Судалгаа 1 (1998)</div><div><i style="background:var(--cash)"></i>Судалгаа 2 (2023)</div></div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">48 / 60</span><h3>7.1 Өгүүллийн харьцуулалт</h3></div>
+      <div class="row">
+        <div class="s1"><h5>1. СУДАЛГААНЫ ЕРӨНХИЙ МЭДЭЭЛЭЛ</h5><ul><li><b>Нэр:</b> The Relation Between Earnings and Cash Flows</li><li><b>Судлаачид:</b> Patricia M. Dechow, S. P. Kothari, Ross L. Watts.</li><li><b>Сэтгүүл:</b> Journal of Accounting and Economics, Vol. 25, Issue 2, pp. 133–168.</li></ul><p class="concl"><b>Гол асуудал:</b> Цэвэр ашиг болон тухайн үеийн үйл ажиллагааны мөнгөн урсгалын аль нь ирээдүйн мөнгөн урсгалыг илүү сайн таамаглах вэ?</p></div>
+        <div class="s2"><h5>1. СУДАЛГААНЫ ЕРӨНХИЙ МЭДЭЭЛЭЛ</h5><ul><li><b>Нэр:</b> What is more relevant? A comparison of cash flows indicators versus profit or loss from listed European companies</li><li><b>Судлаачид:</b> Fábio Albuquerque, Ana Rita Velez, Vera Pinto.</li><li><b>Сэтгүүл:</b> Cogent Business &amp; Management, Vol. 10, Issue 3.</li></ul><p class="concl"><b>Гол асуудал:</b> Ашиг, алдагдал болон мөнгөн урсгалын аль нь хувьцааны зах зээлийн үнийг илүү сайн тайлбарлаж, ирээдүйн мөнгөн урсгалыг илүү сайн таамаглах вэ?</p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">49 / 60</span><h3>7.2 СУДАЛГААНЫ АРГА ЗҮЙ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>2. СУДАЛГААНЫ АРГА ЗҮЙ</h5><ul><li><b>Онолын загварчлал (Theoretical Modeling):</b> Борлуулалт Random Walk процессоор өөрчлөгдөх, зардал хувьсах болон тогтмол байх, авлага, өглөг, бараа материалын өөрчлөлт аккруэл үүсгэх нөхцөлөөр загвар боловсруулсан.</li><li><b>Таамаглах чадварын шинжилгээ (Forecast Accuracy):</b> Ирээдүйн CFO-г тухайн үеийн Earnings болон CFO-оор тус тус таамаглаж, таамаглалын алдааны стандарт хазайлтыг харьцуулсан.</li><li><b>Регрессийн шинжилгээ:</b> Компани тус бүрээр хугацааны цувааны олон хүчин зүйлийн регресс хийж, коэффициентүүдийн дундаж, статистикийн ач холбогдлыг үнэлсэн.</li><li><b>Корреляцын шинжилгээ:</b> Serial болон Cross-correlation ашиглан мөнгөн урсгал, аккруэл, ашгийн хугацааны хамаарлыг шалгасан.</li><li><b>Загварын баталгаажуулалт:</b> Тогтмол зардлыг нэмсэн загвар боловсруулж, таамагласан болон бодит корреляцыг харьцуулсан.</li></ul></div>
+        <div class="s2"><h5>2. СУДАЛГААНЫ АРГА ЗҮЙ</h5><ul><li><b>Архивын судалгаа (Archival Research):</b> Компанийн жилийн нэгтгэсэн санхүүгийн тайлан болон хувьцааны зах зээлийн мэдээллийг ашигласан.</li><li><b>Агуулгын шинжилгээ (Content Analysis):</b> IFRS тайлангаас ашиг, алдагдал, мөнгөн урсгал, дансны үнэ болон бусад үзүүлэлтийг цуглуулсан.</li><li><b>Хувьцааны үнийн шинжилгээ (Value Relevance):</b> OCF болон P&amp;L-ийн хувьцааны үнэд үзүүлэх тайлбарлах чадварыг харьцуулсан.</li><li><b>Таамаглах чадварын шинжилгээ (Predictive Value):</b> Өмнөх үеийн OCF болон P&amp;L-ээр ирээдүйн CFO-г таамагласан.</li><li><b>Статистик шинжилгээ:</b> Linear Regression, Correlation, VIF, ANOVA, Adjusted R² болон тохиромжтой загваруудад Durbin-Watson ашигласан.</li></ul></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">50 / 60</span><h3>7.3 ЭКОНОМЕТРИК ЗАГВАР</h3></div>
+      <div class="row">
+        <div class="s1"><h5>3. ЭКОНОМЕТРИК ЗАГВАР</h5><p>Ирээдүйн мөнгөн урсгалыг тухайн үеийн цэвэр ашиг болон CFO-оос хамааруулсан олон хүчин зүйлийн регрессийн загвар ашигласан.</p>
+          <div class="math">OCF<sub>i,t+q</sub> = c<sub>i,0</sub> + c<sub>i,1</sub>CF<sub>i,t</sub> + c<sub>i,2</sub>E<sub>i,t</sub> + ε</div>
+          <ul><li><b>Хамаарах хувьсагч:</b> Ирээдүйн OCF.</li><li><b>Үл хамаарах хувьсагч:</b> Одоогийн CFO, Earnings.</li><li><b>Нэмэлт загварууд:</b> Serial Correlation, Cross-correlation, Fixed Cost Model.</li></ul><p class="muted">Регрессийг компани тус бүрээр тооцож, хөндлөн огтлолын дундаж коэффициентээр үр дүнг нэгтгэсэн.</p></div>
+        <div class="s2"><h5>3. ЭКОНОМЕТРИК ЗАГВАР</h5><p>Хоёр үндсэн регрессийн загвар ашигласан.</p>
+          <p><b>А. Value Relevance Model:</b></p><div class="math">ESP = β<sub>0</sub> + β<sub>1</sub>BVPS + β<sub>2</sub>P&amp;LPS + β<sub>3</sub>OCFPS + ε</div>
+          <ul><li>Хамаарах хувьсагч: Хувьцааны үнэ (ESP).</li><li>Үл хамаарах хувьсагч: BVPS, P&amp;LPS, OCFPS.</li><li>Хяналтын хувьсагч: Leverage, Country, Sector.</li></ul>
+          <p><b>Б. Predictive Value Model:</b></p><div class="math">OCF<sub>2021</sub> = β<sub>0</sub> + β<sub>1</sub>X<sub>2020</sub> + β<sub>2</sub>X<sub>2019</sub> + ε</div>
+          <p class="muted">X нь өмнөх үеийн OCF эсвэл P&amp;L. Эдгээр загварын тайлбарлах чадварыг Adjusted R², ANOVA-аар үнэлсэн.</p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">51 / 60</span><h3>7.4 СУДАЛГААНЫ ТҮҮВЭР БА ӨГӨГДӨЛ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>4. СУДАЛГААНЫ ТҮҮВЭР БА ӨГӨГДӨЛ</h5><div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="tile earn" style="padding:14px"><b style="font-size:26px">1,337</b><span>Компани</span></div><div class="tile earn" style="padding:14px"><b style="font-size:26px">22,776</b><span>Ажиглалт</span></div><div class="tile" style="padding:14px"><b style="font-size:20px">1963–1992</b><span>Хугацаа</span></div></div>
+          <ul><li><b>Компани:</b> 1,337.</li><li><b>Ажиглалт:</b> 22,776.</li><li><b>Хугацаа:</b> 1963–1992.</li><li><b>Эх сурвалж:</b> Compustat Annual Industrial болон Annual Research.</li><li>Компани бүрийн цэвэр ашиг, аккруэл, мөнгөн урсгалын эхний ялгаврын үзүүлэлтээр дор хаяж 10 ажиглалттай байх шаардлага тавьсан.</li><li>Хувьцааны хуваалт, капиталын өөрчлөлтөд тохируулж, хэт их хэлбэлзэлтэй дээд болон доод 1%-ийн ажиглалтыг хассан.</li></ul></div>
+        <div class="s2"><h5>4. СУДАЛГААНЫ ТҮҮВЭР БА ӨГӨГДӨЛ</h5><div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="tile cash" style="padding:14px"><b style="font-size:26px">121</b><span>Компани</span></div><div class="tile cash" style="padding:14px"><b style="font-size:26px">484</b><span>Тайлан</span></div><div class="tile" style="padding:14px"><b style="font-size:20px">2018–2021</b><span>Хугацаа</span></div></div>
+          <ul><li><b>Компани:</b> 121.</li><li><b>Тайлан:</b> 484.</li><li><b>Хугацаа:</b> 2018–2021.</li><li><b>Эх сурвалж:</b> Euronext-д бүртгэлтэй компаниудын жилийн нэгтгэсэн санхүүгийн тайлан.</li><li><b>Хамрах хүрээ:</b> 6 улсын хөрөнгийн биржийн индекс, 5 эдийн засгийн салбар.</li><li>Санхүү, даатгалын салбарын компаниудыг түүврээс хассан.</li><li>IAS/IFRS стандартын дагуу бэлтгэсэн санхүүгийн мэдээлэл болон хувьцааны зах зээлийн үнийг ашигласан.</li></ul></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">52 / 60</span><h3>7.5 СУДАЛГААНЫ ТААМАГЛАЛ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>5. СУДАЛГААНЫ ТААМАГЛАЛ</h5><ul><li>Цэвэр ашиг нь тухайн үеийн үйл ажиллагааны мөнгөн урсгалаас илүү ирээдүйн мөнгөн урсгалыг таамаглах чадвартай.</li><li>Үйл ажиллагааны мөнгөн мөчлөг уртсах тусам цэвэр ашиг болон CFO-ийн таамаглах чадварын ялгаа нэмэгдэнэ.</li><li>Аккруэл тохируулга нь мөнгөн урсгалын сөрөг хугацааны хамаарлыг бууруулж, ашгийн өөрчлөлтийг тогтвортой болгоно.</li></ul><p class="note"><b>Тайлбар:</b> Эдгээр нь зохиогчдын онолын загвараас гарсан таамаглал бөгөөд албан ёсны H1, H2 дугаарлалт биш.</p></div>
+        <div class="s2"><h5>5. СУДАЛГААНЫ ТААМАГЛАЛ</h5><ul><li><b>H1:</b> Ашиг, алдагдлын мэдээлэл (P&amp;L) нь үйл ажиллагааны мөнгөн урсгалаас (OCF) илүү компанийн хувьцааны зах зээлийн үнийг тайлбарлах чадвартай байна.</li><li><b>H2:</b> Өмнөх үеийн P&amp;L нь өмнөх үеийн OCF-оос илүү ирээдүйн мөнгөн урсгалыг таамаглах чадвартай байна.</li></ul><p class="note">Эдгээр таамаглалын хүрээнд улс орон болон салбарын нөлөөг мөн харгалзсан.</p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">53 / 60</span><h3>7.6 ЭМПИРИК ҮР ДҮН – ТААМАГЛАХ АЛДАА</h3></div>
+      <div class="row">
+        <div class="s1"><h5>6. ЭМПИРИК ҮР ДҮН – ТААМАГЛАХ АЛДАА</h5><p>Ирээдүйн CFO-г тухайн үеийн хоёр өөр үзүүлэлтээр таамаглаж, стандарт хазайлтаар алдааг харьцуулсан.</p>
+          <div class="hb" id="c53a" style="--lw:110px"></div>
+          <ul><li>1 жилийн алдаа: CFO 1.89, Earnings 1.60.</li><li>2 жилийн алдаа: CFO 2.06, Earnings 1.59.</li><li>3 жилийн алдаа: CFO 2.10, Earnings 1.65.</li></ul><p>Бүх хугацаанд Earnings ашигласан таамаглалын алдаа бага гарсан. Алдааны ялгаа статистикийн ач холбогдолтой байв.</p><p class="concl"><b>Дүгнэлт:</b> Цэвэр ашиг ирээдүйн мөнгөн урсгалыг таамаглахад илүү мэдээлэл агуулсан.</p></div>
+        <div class="s2"><h5>6. ЭМПИРИК ҮР ДҮН – ХУВЬЦААНЫ ҮНЭ (H1)</h5><p>Хувьцааны үнийг тайлбарлах регрессийн загваруудын үр дүн:</p>
+          <div class="hb" id="c53b" style="--lw:110px"></div>
+          <ul><li>OCF загвар: Adjusted R² = 39%.</li><li>P&amp;L загвар: Adjusted R² = 22%.</li><li>OCF болон P&amp;L-ийг хамтад нь оруулсан загварт OCF-ийн коэффициент 11.85***, P&amp;L-ийн коэффициент -0.10 буюу статистикийн ач холбогдолгүй гарсан.</li></ul><p class="concl"><b>Дүгнэлт:</b> OCF хувьцааны үнийг тайлбарлах чадвараараа P&amp;L-ээс илүү байсан. <span class="verdict">H1 дэмжигдээгүй.</span></p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">54 / 60</span><h3>7.7 ЭМПИРИК ҮР ДҮН – РЕГРЕССИЙН ШИНЖИЛГЭЭ, ИРЭЭДҮЙН CFO (H2)</h3></div>
+      <div class="row">
+        <div class="s1"><h5>7. ЭМПИРИК ҮР ДҮН – РЕГРЕССИЙН ШИНЖИЛГЭЭ</h5><p>Ирээдүйн CFO-г одоогийн CFO болон Earnings-ээс хамааруулсан регрессийн үр дүн:</p><ul><li>Earnings коэффициент: 1, 2, 3 жилийн таамаглалд 0.45, 0.45, 0.32.</li><li>CFO коэффициент: 0.07, -0.03, -0.11.</li><li>Adjusted R²: 23.2%, 11.1%, 4.1%.</li></ul><p>Earnings-ийн коэффициент бүх хугацаанд эерэг, статистикийн ач холбогдолтой гарсан. CFO-ийн нэмэлт таамаглах чадвар харьцангуй сул байв.</p><p class="concl"><b>Дүгнэлт:</b> Цэвэр ашиг мөнгөн урсгалаас нэмэлт таамаглах мэдээлэл агуулдаг.</p></div>
+        <div class="s2"><h5>7. ЭМПИРИК ҮР ДҮН – ИРЭЭДҮЙН CFO (H2)</h5><p>2021 оны CFO-г өмнөх үеийн мэдээллээр таамагласан.</p>
+          <div class="hb" id="c54" style="--lw:110px"></div>
+          <ul><li>Өмнөх OCF загвар: Adjusted R² = 90%.</li><li>Өмнөх P&amp;L загвар: Adjusted R² = 79%.</li><li>OCF загварын коэффициентүүд 2020 онд 0.45***, 2019 онд 0.71***.</li><li>P&amp;L загварын коэффициентүүд 2020 онд -0.01 (ач холбогдолгүй), 2019 онд 1.65***, 2018 онд 0.58***.</li><li>OCF загварын 2018 оны үзүүлэлтийг олон шугаман хамаарлаас шалтгаалан хассан.</li></ul><p class="concl"><b>Дүгнэлт:</b> Түүхэн OCF нь ирээдүйн мөнгөн урсгалыг таамаглахад илүү үр дүнтэй байсан. <span class="verdict">H2 дэмжигдээгүй.</span></p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">55 / 60</span><h3>7.8 КОРРЕЛЯЦ БА НЭМЭЛТ ШИНЖИЛГЭЭ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>8. КОРРЕЛЯЦ БА НЭМЭЛТ ШИНЖИЛГЭЭ</h5><ul><li>ΔCFO-ийн хугацааны корреляц: -0.28.</li><li>ΔAccruals-ийн хугацааны корреляц: -0.27.</li><li>ΔEarnings-ийн хугацааны корреляц: -0.02.</li><li>Аккруэл болон тухайн үеийн CFO-ийн өөрчлөлтийн корреляц -0.88 гарсан.</li></ul><p>Тогтмол зардлыг нэмсэн загвараар бодит корреляцын хамаарлыг илүү сайн тайлбарлах боломж бүрдсэн ч бүх хамаарлыг бүрэн тайлбарлаж чадаагүй.</p><p class="concl"><b>Дүгнэлт:</b> Аккруэл тохируулга мөнгөн урсгалын хугацааны зөрүүг нөхөж, цэвэр ашгийн өөрчлөлтийг тогтвортой болгодог.</p></div>
+        <div class="s2"><h5>8. НЭМЭЛТ ШИНЖИЛГЭЭ</h5><p>IASB-ийн Exposure Draft-д нийцүүлэн тохируулсан OCF' болон компанийн Non-GAAP мөнгөн урсгалын үзүүлэлтийг ашиглан давтан шинжилсэн.</p>
+          <div class="hb" id="c55" style="--lw:110px"></div>
+          <ul><li>OCF' загвар: Adjusted R² = 89%.</li><li>NGM загвар: Adjusted R² = 74%.</li><li>Ирээдүйн P&amp;L-ийг таамаглах нэмэлт загваруудын Adjusted R² 22–33% байв.</li></ul><p class="concl"><b>Дүгнэлт:</b> Мөнгөн урсгалын үзүүлэлтүүд ирээдүйн CFO-г таамаглахад илүү үр дүнтэй байсан бол ирээдүйн ашгийг таамаглах чадвар харьцангуй бага байв.</p></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">56 / 60</span><h3>7.9-10 АРГА ЗҮЙН ДАВУУ ТАЛ БОЛОН ХЯЗГААРЛАЛТ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>9. АРГА ЗҮЙН ДАВУУ ТАЛ</h5><ul><li>Урт хугацааны, өргөн хүрээний түүвэр ашигласан.</li><li>Онолын загварыг эмпирик мэдээллээр шалгасан.</li><li>Таамаглалын алдаа, хугацааны болон харилцан корреляцын шинжилгээг хослуулсан.</li><li>Үйл ажиллагааны мөнгөн мөчлөгийн нөлөөг тусгайлан судалсан.</li></ul></div>
+        <div class="s2"><h5>9. АРГА ЗҮЙН ДАВУУ ТАЛ</h5><ul><li>Орчин үеийн IAS/IFRS тайлангийн мэдээлэл ашигласан.</li><li>Хувьцааны үнэ болон ирээдүйн мөнгөн урсгалыг тусад нь судалсан.</li><li>Улс, салбар, санхүүгийн хөшүүргийн нөлөөг хянасан.</li><li>OCF, OCF', Non-GAAP үзүүлэлтүүдийг харьцуулсан.</li></ul></div>
+      </div>
+      <div class="row">
+        <div class="s1"><h5>10. АРГА ЗҮЙН ХЯЗГААРЛАЛТ</h5><ul><li>Зөвхөн урт хугацааны мэдээлэлтэй, үргэлжлэн үйл ажиллагаа явуулсан компаниудыг сонгосон тул Survivorship Bias үүсэх боломжтой.</li><li>Random Walk борлуулалтын таамаглал нь бүх компанийн бодит нөхцөлийг илэрхийлэхгүй байж болно.</li><li>CFO-г стандартын мөнгөн гүйлгээний тайлангаас шууд аваагүй, зохиогчдын тооцоолсон хэмжүүр ашигласан.</li></ul></div>
+        <div class="s2"><h5>10. АРГА ЗҮЙН ХЯЗГААРЛАЛТ</h5><ul><li>121 компани, дөрвөн жилийн мэдээлэл нь түүврийн болон хугацааны хувьд хязгаарлагдмал.</li><li>Ирээдүйн CFO-г зөвхөн 2021 оны үзүүлэлтээр шалгасан.</li><li>OCF ба P&amp;L загварын лагийн тоо ялгаатай тул үр дүнг шууд адил нөхцөлд харьцуулахад болгоомжтой хандах шаардлагатай.</li><li>Adjusted R² нь загварын тайлбарлах чадвар болохоос таамаглалын бодит алдааны хэмжүүр биш.</li></ul></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">57 / 60</span><h3>7.11-12 ҮР ДҮНГИЙН ШҮҮМЖЛЭЛ, МОНГОЛД ХЭРЭГЖИХ БОЛОМЖ</h3></div>
+      <div class="row">
+        <div class="s1"><h5>11. ҮР ДҮНГИЙН ШҮҮМЖЛЭЛ</h5><p>Аккруэл бүртгэл нь авлага, өглөг, бараа материалын хугацааны зөрүүг нөхөж, цэвэр ашгийн таамаглах чадварыг нэмэгдүүлдэг гэсэн онолын механизмыг дэмжсэн.</p><p>Гэвч цэвэр ашгийн өөрчлөлт болон ирээдүйн CFO-ийн зарим корреляц онолын таамаглалаас зөрсөн. Иймээс загвар бодит үйл ажиллагааны бүх онцлогийг бүрэн тайлбарлаагүй.</p></div>
+        <div class="s2"><h5>11. ҮР ДҮНГИЙН ШҮҮМЖЛЭЛ</h5><p>Түүхэн мөнгөн урсгал ирээдүйн CFO-г илүү сайн тайлбарласан боловч энэ нь бүх улс, салбар, эдийн засгийн нөхцөлд мөнгөн урсгал үргэлж давуу гэсэн үг биш.</p><p>Мөнгөн урсгалын давуу тал нь түүврийн бүтэц, тайлагналын стандарт, загварын сонголтоос хамаарах боломжтой.</p><p>H2 загварын лагийн тооны ялгаа нь харьцуулалтын хязгаарлалт юм.</p></div>
+      </div>
+      <div class="row">
+        <div class="s1"><h5>12. МОНГОЛЫН НӨХЦӨЛД ХЭРЭГЖҮҮЛЭХ БОЛОМЖ</h5><ul><li>Үйлдвэрлэл, худалдаа, уул уурхайн компаниудад аккруэл тохируулга болон үйл ажиллагааны мөнгөн мөчлөгийн нөлөөг судлахад тохиромжтой.</li><li>МХБ-д бүртгэлтэй компаниудын 8–10 жилийн санхүүгийн мэдээллээр CFO болон Earnings-ийн ирээдүйн CFO таамаглах чадварыг шалгаж болно.</li><li>DSO, DIO, DPO үзүүлэлтийг ашиглан мөнгөн мөчлөгийн нөлөөг судлах боломжтой.</li></ul></div>
+        <div class="s2"><h5>12. МОНГОЛЫН НӨХЦӨЛД ХЭРЭГЖҮҮЛЭХ БОЛОМЖ</h5><ul><li>МХБ-д бүртгэлтэй компаниудын санхүүгийн тайлан болон хувьцааны үнийн мэдээллээр Value Relevance шинжилгээ хийх боломжтой.</li><li>EPS, CFO per Share, BVPS болон Leverage-ийг ашиглан хувьцааны зах зээлийн үнийг тайлбарлах загвар байгуулж болно.</li><li>Үйлдвэрлэл, уул уурхай, худалдааны салбарыг тусад нь ангилж, салбарын ялгааг хянах шаардлагатай. Банк, даатгалын салбарыг тусгай загвараар судлах нь зүйтэй.</li></ul></div>
+      </div>
+
+      <div class="cmpsec"><span class="sn" style="position:static;display:block;margin-bottom:8px">58 / 60</span><h3>Хоёр судалгааны нэгдсэн дүгнэлт</h3></div>
+      <div class="row"><div class="s1"><p>Цэвэр ашиг нь тухайн үеийн мөнгөн урсгалаас илүү ирээдүйн мөнгөн урсгалыг таамаглах чадвартай. Аккруэл бүртгэл нь мөнгөн орлого, зарлагын хугацааны зөрүүг нөхөж, ашигт ирээдүйн мөнгөн урсгалын талаарх мэдээлэл тусгадаг.</p></div><div class="s2"><p>Өмнөх үеийн мөнгөн урсгал нь ирээдүйн мөнгөн урсгалыг таамаглах, хувьцааны зах зээлийн үнийг тайлбарлах чадвараараа ашиг, алдагдлын мэдээллээс илүү байсан.</p></div></div>
+      <div class="row"><div class="s1"><p>АНУ-ын 1963–1992 оны санхүүгийн мэдээлэл, компанийн түвшний урт хугацааны хугацааны цувааны шинжилгээнд тулгуурласан. CFO-ийн хэмжүүрийг судлаачид өөрсдөө тооцсон.</p></div><div class="s2"><p>Европын 2018–2021 оны IFRS тайлан, хувьцааны зах зээлийн мэдээлэлд тулгуурласан. CFO-г санхүүгийн тайлангийн үзүүлэлтээр хэмжсэн.</p></div></div>
+      <div class="row"><div class="s1"><p>Аккруэл тохируулга болон үйл ажиллагааны мөнгөн мөчлөгийг гол тайлбарлагч хүчин зүйл болгон авч үзсэн.</p></div><div class="s2"><p>Улс, салбар, санхүүгийн хөшүүргийг хяналтын хувьсагчаар авч үзсэн.</p></div></div>
+      <div class="row"><div class="s1"><p class="concl" style="background:var(--earn-soft)"><b>Ирээдүйн CFO-г таамаглахдаа цэвэр ашиг давуу гарсан.</b></p></div><div class="s2"><p class="concl" style="background:var(--cash-soft)"><b>Ирээдүйн CFO-г таамаглахдаа түүхэн OCF давуу гарсан.</b></p></div></div>
+      <div class="stack narrow" style="padding-top:32px">
+        <p class="rv">Хоёр судалгааны үр дүнгээс харахад цэвэр ашиг болон үйл ажиллагааны мөнгөн урсгал нь компанийн санхүүгийн гүйцэтгэлийг үнэлэхэд харилцан нөхөх мэдээлэл агуулдаг. 1998 оны судалгаа аккруэл тохируулгын тусламжтайгаар цэвэр ашиг ирээдүйн мөнгөн урсгалыг илүү сайн таамаглах боломжтойг харуулсан бол 2023 оны судалгаа орчин үеийн Европын компаниудын хувьд түүхэн мөнгөн урсгал илүү өндөр таамаглах болон тайлбарлах чадвартай байгааг тогтоосон.</p>
+        <p class="rv">Эдгээр зөрүүтэй үр дүн нь судалгааны түүвэр, хугацаа, хувьсагчийн хэмжилт болон эконометрик загварын ялгаатай холбоотой байж болох бөгөөд аль нэг үзүүлэлтийг бүх нөхцөлд давуу гэж үзэх боломжгүй.</p>
+        <div class="callout rv"><p>Монголын компаниудын хувьд цэвэр ашиг, мөнгөн урсгал, аккруэл болон үйл ажиллагааны мөнгөн мөчлөгийг хамтад нь шинжилж, салбарын онцлогт тохирсон санхүүгийн шийдвэр гаргах нь зүйтэй.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 8 ============ -->
+<section class="chapter finale" id="ch8">
+  <span class="sn">59 / 60</span>
+  <div class="wrap">
+    <div class="cn rv">8</div>
+    <h2 class="rv">Дүгнэлт ба хэлэлцүүлэг</h2>
+    <div class="bul">
+      <p class="rv">Санхүүгийн тайлангуудыг тус тусад нь бус, харилцан уялдаатайгаар шинжлэх шаардлагатай.</p>
+      <p class="rv">Харьцаа, FCF, NOPAT, EVA/MVA болон DuPont нь ашигт ажиллагаа, хөрөнгийн үр ашиг, эрсдэл, үнэ цэнийг өөр өөр өнцгөөс үнэлнэ.</p>
+      <p class="rv">Dechow et al. (1997) судалгаа нь аккруэл ашиг ирээдүйн OCF-ийг таамаглахад хэрэгтэй мэдээлэл агуулдгийг харуулсан.</p>
+      <p class="rv">Гэхдээ ашиг дангаараа мөнгөн хөрвөх чадварыг батлахгүй; мөнгөн урсгал болон эргэлтийн хөрөнгийн үзүүлэлттэй хамт шинжлэх хэрэгтэй.</p>
+    </div>
+    <div class="ask rv"><small>Хэлэлцүүлэг</small><p>Цэвэр ашигтай боловч үйл ажиллагааны мөнгөн урсгал нь сөрөг компанийн санхүүгийн байдлыг хэрхэн үнэлэх вэ?</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="sn">60 / 60</span>
+  <div class="wrap narrow stack">
+    <h2 class="h3">Ашигласан материал, эх сурвалж</h2>
+    <ol class="refs">
+      <li>Brigham, E. F., &amp; Ehrhardt, M. C. (2020). Financial Management: Theory &amp; Practice (16th ed.). Boston, MA: Cengage Learning.</li>
+      <li><a href="https://corporatefinanceinstitute.com/resources/accounting/dupont-analysis/" target="_blank" rel="noopener">https://corporatefinanceinstitute.com/resources/accounting/dupont-analysis/</a></li>
+      <li><a href="https://www.tandfonline.com/doi/epdf/10.1080/23311975.2023.2251214?needAccess=true" target="_blank" rel="noopener">https://www.tandfonline.com/doi/epdf/10.1080/23311975.2023.2251214?needAccess=true</a></li>
+      <li><a href="https://urresearch.rochester.edu/institutionalPublicationPublicView.action?institutionalItemId=4392&amp;versionNumber=1" target="_blank" rel="noopener">https://urresearch.rochester.edu/institutionalPublicationPublicView.action?institutionalItemId=4392&amp;versionNumber=1</a></li>
+    </ol>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">ADVANCED FINANCIAL MANAGEMENT · CHAPTER 2, 3 · 1-р баг</div></footer>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- ratio slides 17–21 (verbatim text) ---------- */
+const R=[
+ {id:'r21',sn:'17',t:'2.1 Ашигт ажиллагааны харьцаа (Profitability Ratios)',h:['↓ Үзүүлэлт буурсан үед','↑ Үзүүлэлт өссөн үед'],o:['dn','up'],rows:[
+  ['Net Profit Margin','Цэвэр ашиг / Борлуулалтын орлого × 100%','Борлуулалтын 1 төгрөг тутмаас хэдэн төгрөгийн цэвэр ашиг олж байгааг харуулна.','Борлуулалтын орлогоос үлдэх ашиг багассан. Зардал өссөн эсвэл үнэ хангалтгүй байж болно.','Борлуулалтын нэгж тутмын ашиг нэмэгдсэн.','Бүтээгдэхүүний үнэ, өртөг, үйл ажиллагааны зардлыг хянах; ашиг багатай бүтээгдэхүүнийг өөрчлөх эсвэл зогсоох.'],
+  ['ROA','Цэвэр ашиг / Нийт хөрөнгийн дундаж × 100%','Компанийн хөрөнгийг ашиглан ашиг бий болгох чадварыг хэмжинэ.','Хөрөнгө ашиг олж бий болгох үр ашиг буурсан.','Хөрөнгөөс бий болгож буй өгөөж нэмэгдсэн.','Ашиглагдахгүй хөрөнгийг борлуулах, тоног төхөөрөмжийн ашиглалтыг нэмэгдүүлэх, хөрөнгө оруулалтын өгөөжийг үнэлэх.'],
+  ['ROE','Цэвэр ашиг / Эздийн өмчийн дундаж × 100%','Эздийн оруулсан хөрөнгөөс ямар хэмжээний өгөөж бий болгосныг харуулна.','Эздийн хөрөнгөөс бий болгож буй өгөөж буурсан.','Эздийн хөрөнгийн өгөөж нэмэгдсэн.','Ногдол ашиг хуваарилах, ашгийг дахин хөрөнгө оруулах, санхүүжилтийн бүтцийг өөрчлөх шийдвэрт ашиглах.']]},
+ {id:'r22',sn:'18',t:'2.2 Хөрөнгийн ашиглалтын харьцаа (Asset Management Ratios)',h:['↓ Үзүүлэлт буурсан үед','↑ Үзүүлэлт өссөн үед'],o:['dn','up'],rows:[
+  ['Inventory Turnover','Борлуулсан бүтээгдэхүүний өртөг / Бараа материалын дундаж үлдэгдэл','Бараа материал жилд хэдэн удаа эргэлдэж байгааг харуулна.','Бараа материал удаан эргэлдэж, борлуулалт муудах эсвэл нөөц хэтэрсэн байж болно.','Бараа материал хурдан борлуулагдаж байна. Гэхдээ нөөц хэт бага байх эрсдэлтэй.','Захиалгын хэмжээ, нөөцийн түвшинг тохируулах; удаан борлогддог барааг бууруулах; худалдан авалтын төлөвлөгөөг сайжруулах.'],
+  ['DSO','Дансны авлагын дундаж / Жилийн зээлийн борлуулалт × 365','Авлагаа дунджаар хэдэн хоногт цуглуулж байгааг илтгэнэ.','Авлага богино хугацаанд цугларч, мөнгөний орлого хурдан орж ирж байна.','Авлага цуглуулах хугацаа уртасч, мөнгөн хөрөнгө авлагад түгжигдэж байна.','Харилцагчийн зээлийн нөхцөл, төлбөрийн хугацааг шинэчлэх; авлага барагдуулах хяналтыг сайжруулах.'],
+  ['Total Assets Turnover','Борлуулалтын орлого / Нийт хөрөнгийн дундаж','Нэг төгрөгийн хөрөнгөөр хэдэн төгрөгийн борлуулалт хийж байгааг харуулна.','Хөрөнгө ашиглан борлуулалт бий болгох үр ашиг буурсан.','Хөрөнгийн нэгж тутмаас бий болгож буй борлуулалт нэмэгдсэн.','Ашиглагдахгүй хөрөнгийг борлуулах; хүчин чадлын ашиглалтыг нэмэгдүүлэх; шинэ хөрөнгө оруулалтын үр ашгийг үнэлэх.']]},
+ {id:'r23',sn:'19',t:'2.3 Төлбөрийн чадварын харьцаа (Liquidity Ratios)',h:['↓ Үзүүлэлт бага үед','↑ Үзүүлэлт өндөр үед'],o:['dn','up'],rows:[
+  ['Current Ratio','Эргэлтийн хөрөнгө / Богино хугацаат өр төлбөр','Богино хугацаат өр төлбөрийг эргэлтийн хөрөнгөөр төлөх чадварыг харуулна.','Богино хугацаат өр төлбөрийг төлөхөд эргэлтийн хөрөнгө хүрэлцэхгүй байх эрсдэлтэй.','Богино хугацааны төлбөрийн чадвар сайн байж болох ч хөрөнгө үр ашиггүй ашиглагдаж байж болно.','Мөнгөн хөрөнгө, авлага, бараа материалын хэмжээг зохицуулах; өр төлбөрийн хугацааг сунгах; богино хугацааны санхүүжилтийн хэрэгцээг тодорхойлох.'],
+  ['Quick Ratio','(Эргэлтийн хөрөнгө − Бараа материал) / Богино хугацаат өр төлбөр','Бараа материалыг борлуулахгүйгээр богино хугацаат өр төлбөрөө төлөх чадварыг хэмжинэ.','Бараа материалыг борлуулахгүйгээр өр төлбөрөө төлөх чадвар сул.','Бэлэн мөнгө болон авлагын хүрэлцээ сайн байна.','Авлага барагдуулах хугацааг богиносгох; мөнгөн хөрөнгийн нөөц бүрдүүлэх; богино хугацаат өр төлбөрийг бууруулах.']]},
+ {id:'r24',sn:'20',t:'2.4 Өрийн удирдлагын харьцаа (Debt Management Ratios)',h:['↑ Үзүүлэлт өссөн үед','↓ Үзүүлэлт буурсан үед'],o:['up','dn'],rows:[
+  ['Debt-to-Assets','Нийт өр төлбөр / Нийт хөрөнгө × 100%','Хөрөнгийн хэдэн хувийг өр төлбөрөөр санхүүжүүлж байгааг харуулна.','Хөрөнгийн ихэнх хэсгийг өрөөр санхүүжүүлж, санхүүгийн эрсдэл нэмэгдэж болзошгүй.','Өрийн санхүүжилтийн хамаарал буурч, санхүүгийн бие даасан байдал нэмэгдэнэ.','Шинээр зээл авах боломж, өрийн хэмжээг тогтоох, санхүүжилтийн бүтцийг өөрчлөх.'],
+  ['TIE','EBIT / Хүүгийн зардал','Үйл ажиллагааны ашиг хүүгийн зардлыг хэд дахин нөхөж байгааг илтгэнэ.','Үйл ажиллагааны ашиг хүүгийн зардлыг нөхөх чадвар сайжирсан.','Хүүгийн төлбөрийг төлөх чадвар суларч, зээлийн эрсдэл нэмэгдэнэ.','Нэмэлт зээл авах эсэх, зээлийн хүүгийн дарамтыг бууруулах, өр төлбөрийн бүтцийг өөрчлөх шийдвэрт ашиглах.'],
+  ['Equity Multiplier','Нийт хөрөнгө / Эздийн өмч','Хөрөнгийн санхүүжилтэд өрийн эх үүсвэр хэр их ашиглаж байгааг харуулна.','Өөрийн хөрөнгөтэй харьцуулахад нийт хөрөнгө өндөр буюу санхүүгийн хөшүүрэг нэмэгдсэн.','Өөрийн хөрөнгийн оролцоо нэмэгдэж, санхүүгийн хөшүүрэг буурсан.','Өр болон өөрийн хөрөнгийн зохистой харьцааг тогтоох, ROE-ийн өсөлт өрийн хөшүүргээс шалтгаалж байгаа эсэхийг үнэлэх.']]},
+ {id:'r25',sn:'21',t:'2.5 Зах зээлийн үнэ цэнийн харьцаа (Market Value Ratios)',h:['↑ Үзүүлэлт өсөх үед','↓ Үзүүлэлт буурах үед'],o:['up','dn'],rows:[
+  ['P/E','Хувьцааны зах зээлийн үнэ / Нэгж хувьцаанд ногдох ашиг (EPS)','Хөрөнгө оруулагчид нэг төгрөгийн ашигт хэдэн төгрөг төлөхөд бэлэн байгааг харуулна.','Хөрөнгө оруулагчид компанийн ирээдүйн өсөлт, ашигт ажиллагаанд өндөр хүлээлттэй байгааг илтгэж болно. Хувьцаа хэт өндөр үнэлэгдсэн байх эрсдэлтэй.','Хувьцаа харьцангуй хямд үнэлэгдсэн байж болно. Гэхдээ компанийн ашиг буурах эрсдэлийг зах зээл тооцсон байж болно.','Хувьцаа худалдан авах, худалдах эсэхийг шийдэхдээ ижил салбарын компаниудтай харьцуулж, хувьцааны үнэлгээ бодитой эсэхийг тодорхойлно.'],
+  ['P/FCF','Хувьцааны зах зээлийн үнэ / Нэгж хувьцаанд ногдох FCF','Хөрөнгө оруулагчид нэг төгрөгийн чөлөөт мөнгөн урсгалд хэдэн төгрөг төлж байгааг илтгэнэ.','Хөрөнгө оруулагчид компанийн чөлөөт мөнгөн урсгалд өндөр үнэ төлж байгааг илтгэнэ. Хувьцаа өндөр үнэлгээтэй байж болно.','Чөлөөт мөнгөн урсгалтай харьцуулахад хувьцааны үнэ хямд байж болох боломжийг илтгэнэ.','Компанийн бодит мөнгөн урсгалд үндэслэн хувьцааны үнэлгээг тодорхойлж, хөрөнгө оруулалтын боломжийг үнэлнэ.'],
+  ['Market/Book','Хувьцааны зах зээлийн үнэ / Нэгж хувьцаанд ногдох дансны үнэ','Зах зээлийн үнэлгээ дансны үнэлгээнээс хэр зөрүүтэй байгааг харуулна.','Зах зээл компанийн ирээдүйн өсөлт, ашиг олох боломжийг өндөр үнэлж байгааг илтгэж болно.','Зах зээл компанийн хөрөнгийг дансны үнээс доогуур үнэлж байгааг илтгэж болно.','Хувьцааны зах зээлийн үнэ компанийн дансны үнэлгээтэй хэр нийцэж байгааг тодорхойлж, хувьцаа хэт үнэлэгдсэн эсвэл дутуу үнэлэгдсэн эсэхийг судална.']]}
+];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function fracify(f){
+  const m=f.match(/^(.*?) \/ (.*?)( × (?:100%|365))?$/);
+  if(!m) return esc(f);
+  return `<span class="frac" aria-label="${esc(f)}"><span>${esc(m[1])}</span><span>${esc(m[2])}</span></span>${m[3]?' '+esc(m[3].trim()):''}`;
+}
+$('#ratios').innerHTML=R.map(c=>`
+<section class="slide" id="${c.id}"><span class="sn">${c.sn} / 60</span><div class="wrap gap-l">
+ <h2 class="h2 rv" style="font-size:clamp(26px,3.6vw,44px)">${esc(c.t)}</h2>
+ <div class="stack">${c.rows.map(r=>`
+  <article class="ratio rv"><header>
+   <div><span class="lab">Үзүүлэлт</span><h4>${esc(r[0])}</h4></div>
+   <div><span class="lab">Томьёо</span><div class="fml">${fracify(r[1])}</div></div>
+   <div><span class="lab">Юуг илтгэх вэ?</span><p class="mean">${esc(r[2])}</p></div></header>
+   <div class="states">
+    <div class="st ${c.o[0]}"><span class="lab"><span class="ar">${c.h[0][0]}</span>${esc(c.h[0].slice(2))}</span>${esc(r[3])}</div>
+    <div class="st ${c.o[1]}"><span class="lab"><span class="ar">${c.h[1][0]}</span>${esc(c.h[1].slice(2))}</span>${esc(r[4])}</div>
+    <div class="st dec"><span class="lab">Шийдвэр гаргалтад ашиглах нь</span>${esc(r[5])}</div>
+   </div></article>`).join('')}
+ </div></div></section>`).join('');
+
+/* ---------- decision matrix (slide 24) ---------- */
+const D=[
+ ['Борлуулалт өссөн ч авлага хуримтлагдах','DSO, авлагын насжилт, OCF','Зээлийн нөхцөл, цуглуулалтын бодлогыг шинэчлэх'],
+ ['Бараа материал хэт өсөх','Inventory turnover, нөөцийн насжилт, FCF','Худалдан авалт ба нөөцийн хэмжээг тохируулах'],
+ ['Цэвэр ашиг эерэг боловч OCF сөрөг','Аккруэл зүйлс, авлага, бараа материал, өглөг','Ашгийн чанар, богино хугацааны хөрвөх чадварыг шалгах'],
+ ['ROE өсөх боловч өрийн хөшүүрэг нэмэгдэх','DuPont, Debt/Equity, TIE','Өрийн тогтвортой байдал, хүү төлөх чадварыг үнэлэх'],
+ ['EVA сөрөг','NOPAT, хөрөнгө оруулсан капитал, WACC','Капиталын өгөөж ба хөрөнгө оруулалтын сонголтыг дахин үнэлэх'],
+ ['Борлуулалт өссөн ч үйл ажиллагааны ашиг буурах','Gross Profit Margin, Operating Profit Margin, зардлын өсөлтийн хувь','Үнэ тогтоолт, бүтээгдэхүүний бүтэц, үйлдвэрлэл болон үйл ажиллагааны зардлыг дахин үнэлэх'],
+ ['Борлуулалт өсөөгүй байхад нийт хөрөнгө нэмэгдэх','Total Assets Turnover, ROA, хөрөнгийн ашиглалтын түвшин','Ашиглагдахгүй хөрөнгийг борлуулах, сул хүчин чадлыг ашиглах, шинэ хөрөнгө оруулалтыг хойшлуулах'],
+ ['Богино хугацаат өр төлбөр хурдтай өсөх','Current Ratio, Quick Ratio, Operating Cash Flow Ratio','Өр төлбөрийн хугацааг сунгах, богино хугацааны санхүүжилтийн бүтцийг өөрчлөх'],
+ ['Хүүгийн зардал нэмэгдэж, ашигт ажиллагаа буурах','TIE, Interest Expense Ratio, Operating Profit Margin','Өрийн бүтцийг дахин тохируулах, өндөр хүүтэй зээлийг бууруулах, санхүүжилтийн өртгийг бууруулах'],
+ ['Үйл ажиллагааны зардал борлуулалтаас хурдан өсөх','Operating Expense Ratio, Operating Profit Margin','Зардлын хяналт тогтоох, үр ашиг багатай үйл ажиллагааг оновчлох'],
+ ['Хувьцааны зах зээлийн үнэ ашиг, мөнгөн урсгалын өсөлтөөс хурдан нэмэгдэх','P/E, P/FCF, Market/Book','Хувьцааны үнэлгээ хэт өссөн эсэхийг шалгах, хөрөнгө оруулалтын эрсдэлийг дахин үнэлэх']];
+$('#dec').insertAdjacentHTML('beforeend',D.map(r=>`<div class="row"><div class="c1"><span class="ml">Илэрсэн нөхцөл</span>${esc(r[0])}</div><div class="c2"><span class="ml">Шинжлэх үзүүлэлт</span>${esc(r[1])}</div><div class="c3"><span class="ml">Боломжит шийдвэр</span>${esc(r[2])}</div></div>`).join(''));
+
+/* ---------- horizontal bars ---------- */
+function hbar(id,rows,{min=0,max,fmt=v=>v}={}){
+  const el=document.getElementById(id); if(!el) return;
+  const span=max-min, z=(0-min)/span*100;
+  el.innerHTML=rows.map(r=>{
+    const a=(Math.min(0,r.v)-min)/span*100, b=(Math.max(0,r.v)-min)/span*100;
+    const neg=r.v<0;
+    return `<div class="r"><span class="lb">${r.l}</span><span class="tr">${min<0?`<i class="zero" style="left:${z}%"></i>`:''}<i class="bar" style="left:${a}%;width:${b-a}%;background:${r.c};transform-origin:${neg?'right':'left'}"></i></span><span class="v">${r.d??fmt(r.v)}</span></div>`}).join('');
+  el.classList.add('chartbars');
+}
+const C='var(--cash)',E='var(--earn)',A='var(--accr)',S='var(--cash-soft)';
+hbar('c30a',[{l:'Цэвэр ашиг (Earnings)',v:1.13,c:E,d:'1.13'},{l:'Үйл ажиллагааны мөнгөн урсгал (CF)',v:1.63,c:C,d:'1.63'},{l:'Аккруэл (Accruals)',v:-0.5,c:A,d:'-0.50'}],{min:-1,max:2});
+hbar('c30b',[{l:'Цэвэр ашиг (Earnings)',v:.85,c:E,d:'0.85'},{l:'Үйл ажиллагааны мөнгөн урсгал (CF)',v:4.94,c:C,d:'4.94'},{l:'Аккруэл (Accruals)',v:5.35,c:A,d:'5.35'}],{max:6});
+hbar('c31',[{l:'Profit Margin (p)',v:4.95,c:E,d:'4.95%'},{l:'Accounts Receivable (a)',v:15,c:C,d:'15%'},{l:'Accounts Payable (b)',v:7,c:C,d:'7%'},{l:'Inventory (c1)',v:16,c:C,d:'16%'},{l:'Operating Cash Cycle (d)',v:23,c:A,d:'23%'}],{max:25});
+hbar('c44',[{l:'EPS',v:1.78,c:'var(--faint)',d:'1.78'},{l:'P&amp;L PS',v:3.86,c:E,d:'3.86'},{l:'OCF PS',v:5.95,c:C,d:'5.95'},{l:"OCF' PS",v:6.03,c:C,d:'6.03'},{l:'NGM PS',v:2.82,c:A,d:'2.82'}],{max:7});
+(function(){const el=$('#c45');const m=[['M10h2',.30,.23],['M11h2',.29,.22],['M12h2',.40,.33],['M13h2',.32,.25]];
+ el.innerHTML=m.map(r=>`<div class="r"><span class="lb mono">${r[0]}</span><span class="tr" style="height:34px;background:none"><i class="bar" style="left:0;top:0;height:15px;bottom:auto;width:${r[1]/.5*100}%;background:${S};border:1px solid var(--cash)"></i><i class="bar" style="left:0;top:19px;height:15px;bottom:auto;width:${r[2]/.5*100}%;background:${C}"></i></span><span class="v" style="display:grid;gap:4px;font-size:12.5px"><span class="muted">${r[1].toFixed(2)}</span><span>${r[2].toFixed(2)}</span></span></div>`).join('')
+ +`<div class="r"><span></span><span style="display:flex;justify-content:space-between;font:500 11px var(--f-mono);color:var(--faint)"><span>0</span><span>0.25</span><span>0.50</span></span><span></span></div>`;
+ el.classList.add('chartbars');})();
+hbar('c53a',[{l:'CFO · 1 жил',v:1.89,c:C,d:'1.89'},{l:'Earnings · 1 жил',v:1.60,c:E,d:'1.60'},{l:'CFO · 2 жил',v:2.06,c:C,d:'2.06'},{l:'Earnings · 2 жил',v:1.59,c:E,d:'1.59'},{l:'CFO · 3 жил',v:2.10,c:C,d:'2.10'},{l:'Earnings · 3 жил',v:1.65,c:E,d:'1.65'}],{max:2.4});
+hbar('c53b',[{l:'OCF загвар',v:39,c:C,d:'39%'},{l:'P&amp;L загвар',v:22,c:E,d:'22%'}],{max:100});
+hbar('c54',[{l:'Өмнөх OCF',v:90,c:C,d:'90%'},{l:'Өмнөх P&amp;L',v:79,c:E,d:'79%'}],{max:100});
+hbar('c55',[{l:"OCF'",v:89,c:C,d:'89%'},{l:'NGM',v:74,c:A,d:'74%'}],{max:100});
+
+/* ---------- slope chart slide 32 ---------- */
+(function(){const s=$('#c32');const W=560,H=300,L=52,Rr=96,T=24,B=40;
+ const x=i=>L+i*(W-L-Rr)/2, y=v=>T+(2.2-v)/(2.2-1.4)*(H-T-B);
+ const cf=[1.89,2.06,2.10], ea=[1.60,1.59,1.65];
+ let g='';[1.4,1.6,1.8,2.0,2.2].forEach(v=>{g+=`<line class="grid" x1="${L}" x2="${W-Rr+20}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-10}" y="${y(v)+4}" text-anchor="end">${v.toFixed(1)}</text>`});
+ ['1 жил','2 жил','3 жил'].forEach((t,i)=>g+=`<text x="${x(i)}" y="${H-12}" text-anchor="middle">${t}</text>`);
+ const area=`M${cf.map((v,i)=>`${x(i)},${y(v)}`).join('L')}L${ea.map((v,i)=>[i,v]).reverse().map(([i,v])=>`${x(i)},${y(v)}`).join('L')}Z`;
+ g+=`<path d="${area}" fill="${css('--cash')}" opacity=".08"/>`;
+ g+=`<path class="lc draw" stroke="${css('--cash')}" d="M${cf.map((v,i)=>`${x(i)},${y(v)}`).join('L')}"/>`;
+ g+=`<path class="lc draw" stroke="${css('--earn')}" d="M${ea.map((v,i)=>`${x(i)},${y(v)}`).join('L')}"/>`;
+ cf.forEach((v,i)=>{g+=`<circle cx="${x(i)}" cy="${y(v)}" r="5.5" fill="${css('--cash')}"/><text x="${x(i)}" y="${y(v)-12}" text-anchor="middle" style="fill:${css('--cash')};font-weight:600">${v.toFixed(2)}</text>`});
+ ea.forEach((v,i)=>{g+=`<circle cx="${x(i)}" cy="${y(v)}" r="5.5" fill="${css('--earn')}"/><text x="${x(i)}" y="${y(v)+22}" text-anchor="middle" style="fill:${css('--earn')};font-weight:600">${v.toFixed(2)}</text>`});
+ [0.29,0.47,0.46].forEach((d,i)=>{if(i<2)return;});
+ g+=`<text x="${x(2)+16}" y="${(y(2.10)+y(1.65))/2+4}" style="font-weight:600;fill:${css('--fg')}">Δ 0.46</text>`;
+ g+=`<text x="${x(1)+14}" y="${(y(2.06)+y(1.59))/2+4}" style="font-weight:600;fill:${css('--fg')}">Δ 0.47</text>`;
+ g+=`<text x="${x(0)+14}" y="${(y(1.89)+y(1.60))/2+4}" style="font-weight:600;fill:${css('--fg')}">Δ 0.29</text>`;
+ s.innerHTML=g;})();
+
+/* ---------- coefficient table slide 32 Panel B ---------- */
+(function(){const el=$('#c32b');const H=['1 жилийн дараа','2 жилийн дараа','3 жилийн дараа'];
+ const mini=(v,min,max,c)=>{const z=(0-min)/(max-min)*100,a=(Math.min(0,v)-min)/(max-min)*100,b=(Math.max(0,v)-min)/(max-min)*100;return `<span class="mini"><u style="left:${z}%"></u><i style="left:${a}%;width:${b-a}%;background:${c}"></i></span>`};
+ const rows=[['Мөнгөн урсгалын коэффициент (c1)',[.07,-.03,-.11],['5.78','-2.19','-5.55'],C],['Цэвэр ашгийн коэффициент (c2)',[.45,.45,.32],['17.72','14.21','7.82'],E]];
+ let h=`<div>Үзүүлэлт</div>${H.map(x=>`<div>${x}</div>`).join('')}`;
+ rows.forEach(r=>{h+=`<div>${r[0]}</div>`+r[1].map((v,i)=>`<div class="cb"><b style="color:${r[3]}">${v.toFixed(2)}</b>${mini(v,-.15,.5,r[3])}<small>t-statistic ${r[2][i]}</small></div>`).join('')});
+ h+=`<div>Adjusted R²</div>`+[23.2,11.1,4.1].map(v=>`<div class="cb"><b>${v}%</b><span class="mini"><i style="left:0;width:${v/25*100}%;background:var(--fg)"></i></span></div>`).join('');
+ el.innerHTML=h;})();
+
+/* ---------- dumbbells ---------- */
+function dumb(id,rows,keys){const el=document.getElementById(id);const p=v=>(v+1)/2*100;
+ el.innerHTML=rows.map(r=>{const vals=keys.map(k=>r[k]).filter(v=>v!=null);const lo=Math.min(...vals),hi=Math.max(...vals);
+  return `<div class="r"><span class="lb">${r.l}</span><span class="tr"><i class="z"></i><i class="seg" style="left:${p(lo)}%;width:${p(hi)-p(lo)}%"></i>${keys.map(k=>r[k]==null?'':`<i class="pt ${k}" style="left:${p(r[k])}%"><span>${r[k].toFixed(2)}</span></i>`).join('')}</span></div>`}).join('')
+ +`<div class="axis"><div></div><div><span>-1.0</span><span>-0.5</span><span>0</span><span>0.5</span><span>1.0</span></div></div>`;}
+dumb('c33',[
+ {l:'Мөнгөн урсгалын өөрчлөлт ба өмнөх үеийн өөрчлөлт',pred:-.35,act:-.28},
+ {l:'Аккруэл өөрчлөлт ба өмнөх үеийн өөрчлөлт',pred:-.41,act:-.27},
+ {l:'Цэвэр ашгийн өөрчлөлт ба өмнөх үеийн өөрчлөлт',pred:0,act:-.02},
+ {l:'Аккруэл ба тухайн үеийн мөнгөн урсгалын өөрчлөлт',pred:-.92,act:-.88},
+ {l:'Цэвэр ашиг ба тухайн үеийн мөнгөн урсгалын өөрчлөлт',pred:-.40,act:.15},
+ {l:'Аккруэл ба дараагийн үеийн мөнгөн урсгалын өөрчлөлт',pred:.46,act:.31},
+ {l:'Цэвэр ашиг ба дараагийн үеийн мөнгөн урсгалын өөрчлөлт',pred:.61,act:-.03}],['pred','act']);
+dumb('c36',[
+ {l:'Цэвэр ашиг болон ирээдүйн мөнгөн урсгалын хамаарал',pred:.61,pred2:.25,act:-.03},
+ {l:'Аккруэл болон тухайн үеийн мөнгөн урсгалын хамаарал',pred:-.92,pred2:-.63,act:-.88},
+ {l:'Цэвэр ашгийн хугацааны корреляц',pred:0,pred2:-.30,act:-.02}],['pred','pred2','act']);
+
+/* ---------- timeline (chapter 7) ---------- */
+(function(){const el=$('#tl');const a=1960,b=2025,p=y=>(y-a)/(b-a)*100;
+ el.innerHTML=`<div class="ax">${[1960,1970,1980,1990,2000,2010,2020].map(y=>`<span class="tk" style="left:${p(y)}%;color:var(--deep-muted)">${y}</span>`).join('')}
+ <i class="win" style="left:${p(1963)}%;width:${p(1992)-p(1963)}%;background:var(--earn)"><span style="color:#ffb59e">Судалгаа 1 (1998) · 1963–1992</span></i>
+ <i class="win" style="left:${p(2018)}%;width:${p(2021)-p(2018)}%;background:var(--glow)"><span style="color:#a9d3ff;left:auto;right:0">Судалгаа 2 (2023) · 2018–2021</span></i></div>`;
+ el.querySelector('.ax').style.background='rgba(255,255,255,.15)';})();
+
+/* ---------- linkage arrows ---------- */
+const links=$('#links'),lsvg=$('#linksvg');
+function drawLinks(){
+  const box=links.getBoundingClientRect();const n={};$$('.node',links).forEach(e=>{const r=e.getBoundingClientRect();n[e.dataset.n]={l:r.left-box.left,r:r.right-box.left,t:r.top-box.top,b:r.bottom-box.top,cx:(r.left+r.right)/2-box.left,cy:(r.top+r.bottom)/2-box.top}});
+  const pad=6;const P=[
+   [n.is.r+pad,n.is.cy,n.sce.l-pad,n.sce.cy],
+   [n.is.cx,n.is.b+pad,n.cfs.cx,n.cfs.t-pad],
+   [n.sce.cx,n.sce.b+pad,n.bs.cx,n.bs.t-pad],
+   [n.cfs.r+pad,n.cfs.cy,n.bs.l-pad,n.bs.cy]];
+  lsvg.setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);
+  lsvg.innerHTML=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="${css('--faint')}" stroke="none"/></marker><marker id="ahl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="${css('--cash')}" stroke="none"/></marker></defs>`+
+   P.map((p,i)=>`<path data-l="${i+1}" d="M${p[0]},${p[1]}L${p[2]},${p[3]}" marker-end="url(#ah)"/>`).join('')+
+   P.map((p,i)=>`<g class="badge" data-l="${i+1}"><circle cx="${(p[0]+p[2])/2}" cy="${(p[1]+p[3])/2}" r="13"/><text x="${(p[0]+p[2])/2}" y="${(p[1]+p[3])/2}">${i+1}</text></g>`).join('');
+  setLink(curLink);
+}
+let curLink=0;
+const LN={1:['is','sce'],2:['is','cfs'],3:['sce','bs'],4:['cfs','bs']};
+function setLink(k){curLink=k;links.classList.toggle('focus',k>0);
+  $$('.node',links).forEach(e=>e.classList.toggle('lit',k>0&&LN[k].includes(e.dataset.n)));
+  $$('path[data-l]',lsvg).forEach(e=>{const on=+e.dataset.l===k;e.classList.toggle('lit',on);e.setAttribute('marker-end',on?'url(#ahl)':'url(#ah)')});
+  $$('.badge',lsvg).forEach(e=>e.classList.toggle('lit',+e.dataset.l===k));
+  $$('#linklbl span').forEach((e,i)=>e.classList.toggle('lit',i+1===k));
+  $$('.step').forEach(e=>e.classList.toggle('on',+e.dataset.step===k));}
+drawLinks(); addEventListener('resize',()=>{drawLinks();drawMerge()});
+if('IntersectionObserver' in window){
+  const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)setLink(+e.target.dataset.step)}),{rootMargin:'-45% 0px -45% 0px'});
+  $$('.step').forEach(s=>so.observe(s));
+}else{$$('.step').forEach(s=>s.classList.add('on'))}
+
+/* ---------- merge lines (cash flow) ---------- */
+function drawMerge(){const s=$('#mergesvg');if(!s)return;const cols=innerWidth<900?[500,500,500]:[166,500,834];
+ const c=[css('--cash'),css('--accr'),css('--earn')];
+ s.innerHTML=cols.map((x,i)=>`<path d="M${x},0 C${x},55 500,40 500,90" stroke="${c[i]}" opacity=".7" stroke-dasharray="4 7"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="1.2s" repeatCount="indefinite"/></path>`).join('');
+ if(RM)$$('animate',s).forEach(a=>a.remove());}
+drawMerge();
+
+/* ---------- calculators ---------- */
+function eva(){const K=+$('#evaK').value,r=+$('#evaR').value,w=+$('#evaW').value;const v=K*(r-w)/100;
+ $('#evaKo').textContent=K.toLocaleString('en-US');$('#evaRo').textContent=r.toFixed(1)+'%';$('#evaWo').textContent=w.toFixed(1)+'%';
+ const o=$('#evaOut');o.textContent=(v>0?'+':'')+v.toLocaleString('en-US',{maximumFractionDigits:1});o.style.color=v>=0?'var(--pos)':'var(--neg)';
+ const st=$('#evaState');st.className='state '+(v>=0?'good':'bad');st.textContent=v>=0?'EVA > 0: Үнэ цэн бүтээсэн.':'EVA < 0: Хөрөнгийн өртгөө нөхөөгүй.';}
+['evaK','evaR','evaW'].forEach(i=>$('#'+i).addEventListener('input',eva));eva();
+function dp(){const pm=+$('#dpPM').value,ta=+$('#dpTA').value,em=+$('#dpEM').value;const roe=pm*ta*em;
+ $('#dpPMo').textContent=pm.toFixed(1)+'%';$('#dpTAo').textContent=ta.toFixed(2)+'×';$('#dpEMo').textContent=em.toFixed(1)+'×';
+ $('#dpOut').textContent=roe.toFixed(1)+'%';
+ const l=[Math.log(1+pm),Math.log(1+ta*4),Math.log(1+em*2)],t=l.reduce((a,b)=>a+b,0);
+ ['fb1','fb2','fb3'].forEach((id,i)=>$('#'+id).style.width=(l[i]/t*100)+'%');}
+['dpPM','dpTA','dpEM'].forEach(i=>$('#'+i).addEventListener('input',dp));dp();
+
+/* ---------- replay cancellation ---------- */
+$$('[data-replay]').forEach(b=>b.addEventListener('click',()=>{const el=document.getElementById(b.dataset.replay);el.classList.remove('go');void el.offsetWidth;setTimeout(()=>el.classList.add('go'),60)}));
+
+/* ---------- reveal + chart grow (only below-the-fold elements are hidden first) ---------- */
+const vh=innerHeight;
+const anims=$$('.rv');const bars=[...$$('.chartbars'),...$$('[data-bars]')];const cancels=$$('.cancel');const casc=$('#cascade');
+if('IntersectionObserver' in window && !RM){
+  anims.forEach(e=>{if(e.getBoundingClientRect().top>vh*0.92)e.classList.add('pre')});
+  bars.forEach(e=>{if(e.getBoundingClientRect().top>vh)e.classList.add('pending');else e.classList.remove('pending')});
+  cancels.forEach(e=>{if(e.getBoundingClientRect().top<vh)e.classList.add('go')});
+  if(casc&&casc.getBoundingClientRect().top>vh)[...casc.children].forEach(c=>c.style.transform='scaleX(0)');
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;
+    t.classList.remove('pre','pending');if(t.classList.contains('cancel'))setTimeout(()=>t.classList.add('go'),300);
+    if(t===casc)[...casc.children].forEach((c,i)=>setTimeout(()=>c.style.transform='',i*140));
+    io.unobserve(t)}),{rootMargin:'0px 0px -8% 0px',threshold:.05});
+  [...anims,...bars,...cancels,casc].filter(Boolean).forEach(e=>io.observe(e));
+}else{bars.forEach(e=>e.classList.remove('pending'));cancels.forEach(e=>e.classList.add('go'))}
+
+/* ---------- nav + progress ---------- */
+const nav=$('#nav'),bar=$('#bar'),hero=$('#top');const chs=$$('.chapter[id^="ch"]');const navA=$$('#navlist a');
+function onScroll(){const y=scrollY;nav.classList.toggle('show',y>hero.offsetHeight-80);
+ const h=document.documentElement.scrollHeight-innerHeight;bar.style.width=(h>0?y/h*100:0)+'%';
+ let cur=-1;chs.forEach((c,i)=>{if(c.getBoundingClientRect().top<innerHeight*.4)cur=i});
+ navA.forEach((a,i)=>a.classList.toggle('on',i===cur));
+ if(cur>=0){const a=navA[cur];const ol=a.parentElement.parentElement;const r=a.getBoundingClientRect(),o=ol.getBoundingClientRect();if(r.left<o.left||r.right>o.right)ol.scrollLeft+=r.left-o.left-20;}}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* ---------- hero flow canvas: many streams converging into one ---------- */
+const cv=$('#flow'),cx=cv.getContext('2d');let W,H,DPR,raf,vis=true,t0=performance.now();
+function size(){DPR=Math.min(2,devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0)}
+const N=46;const lines=[...Array(N)].map((_,i)=>({o:(i/(N-1))-.5,ph:Math.random()*6.28,sp:.15+Math.random()*.25,a:.08+Math.random()*.32}));
+function frame(now){const t=(now-t0)/1000;cx.clearRect(0,0,W,H);
+ const cy=H*.42, spread=H*.95;
+ lines.forEach((l,i)=>{cx.beginPath();
+  for(let s=0;s<=60;s++){const u=s/60,x=u*W;const conv=Math.pow(1-u,1.6);
+   const y=cy+l.o*spread*conv*(.35+.65*(1-u*.2))+Math.sin(u*6+t*l.sp+l.ph)*18*conv+Math.sin(u*2.2-t*.3+i*.2)*10;
+   s?cx.lineTo(x,y):cx.moveTo(x,y)}
+  const g=cx.createLinearGradient(0,0,W,0);g.addColorStop(0,`rgba(77,162,255,${l.a*.3})`);g.addColorStop(.6,`rgba(120,190,255,${l.a})`);g.addColorStop(1,`rgba(190,225,255,${Math.min(.9,l.a*2)})`);
+  cx.strokeStyle=g;cx.lineWidth=1.1;cx.stroke();
+  const u=((t*l.sp*.25+l.ph/6.28)%1);const x=u*W,conv=Math.pow(1-u,1.6);
+  const y=cy+l.o*spread*conv*(.35+.65*(1-u*.2))+Math.sin(u*6+t*l.sp+l.ph)*18*conv+Math.sin(u*2.2-t*.3+i*.2)*10;
+  cx.fillStyle=`rgba(200,230,255,${.5+l.a})`;cx.beginPath();cx.arc(x,y,1.6,0,6.28);cx.fill();});
+ if(!RM&&vis)raf=requestAnimationFrame(frame);}
+size();addEventListener('resize',()=>{size();if(RM)frame(t0+4000)});
+if(RM)frame(t0+4000);else raf=requestAnimationFrame(frame);
+new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis&&!RM){cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}}).observe(hero);
+})();
+</script>
+
+</body>
+</html>
